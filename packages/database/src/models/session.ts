@@ -21,10 +21,12 @@ import { idGenerator } from '../utils/idGenerator';
 export class SessionModel {
   private userId: string;
   private db: LobeChatDatabase;
+  private workspaceId?: string;
 
-  constructor(db: LobeChatDatabase, userId: string) {
+  constructor(db: LobeChatDatabase, userId: string, workspaceId?: string) {
     this.userId = userId;
     this.db = db;
+    this.workspaceId = workspaceId;
   }
   // **************** Query *************** //
 
@@ -276,6 +278,7 @@ export class SessionModel {
             type,
             updatedAt: new Date(),
             userId: this.userId,
+            workspaceId: this.workspaceId,
           })
           .returning();
 
@@ -306,6 +309,7 @@ export class SessionModel {
           tts: tts || {},
           updatedAt: new Date(),
           userId: this.userId,
+          workspaceId: this.workspaceId,
         })
         .returning();
 
@@ -319,6 +323,7 @@ export class SessionModel {
           type,
           updatedAt: new Date(),
           userId: this.userId,
+          workspaceId: this.workspaceId,
         })
         .returning();
 
@@ -352,6 +357,7 @@ export class SessionModel {
         ...s,
         id: this.genId(),
         userId: this.userId,
+        workspaceId: this.workspaceId,
       };
     });
 

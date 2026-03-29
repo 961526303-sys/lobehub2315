@@ -14,10 +14,12 @@ export interface QueryDocumentParams {
 export class DocumentModel {
   private userId: string;
   private db: LobeChatDatabase;
+  private workspaceId?: string;
 
-  constructor(db: LobeChatDatabase, userId: string) {
+  constructor(db: LobeChatDatabase, userId: string, workspaceId?: string) {
     this.userId = userId;
     this.db = db;
+    this.workspaceId = workspaceId;
   }
 
   findOrCreateFolder = async (name: string, parentId?: string): Promise<DocumentItem> => {
@@ -48,7 +50,7 @@ export class DocumentModel {
   create = async (params: Omit<NewDocument, 'userId'>): Promise<DocumentItem> => {
     const result = (await this.db
       .insert(documents)
-      .values({ ...params, userId: this.userId })
+      .values({ ...params, userId: this.userId, workspaceId: this.workspaceId })
       .returning()) as DocumentItem[];
 
     return result[0]!;

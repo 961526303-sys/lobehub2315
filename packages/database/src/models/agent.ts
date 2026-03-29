@@ -21,10 +21,12 @@ import type { LobeChatDatabase } from '../type';
 export class AgentModel {
   private userId: string;
   private db: LobeChatDatabase;
+  private workspaceId?: string;
 
-  constructor(db: LobeChatDatabase, userId: string) {
+  constructor(db: LobeChatDatabase, userId: string, workspaceId?: string) {
     this.userId = userId;
     this.db = db;
+    this.workspaceId = workspaceId;
   }
 
   getAgentConfigById = async (id: string) => {
@@ -342,6 +344,7 @@ export class AgentModel {
           ...config,
           model: typeof config.model === 'string' ? config.model : null,
           userId: this.userId,
+          workspaceId: this.workspaceId,
         },
       ])
       .returning();
@@ -363,6 +366,7 @@ export class AgentModel {
           ...config,
           model: typeof config.model === 'string' ? config.model : null,
           userId: this.userId,
+          workspaceId: this.workspaceId,
         })),
       )
       .returning();
@@ -534,6 +538,7 @@ export class AgentModel {
         tts: sourceAgent.tts,
         // User
         userId: this.userId,
+        workspaceId: this.workspaceId,
       })
       .returning();
 
@@ -592,6 +597,7 @@ export class AgentModel {
         slug: persistConfig.slug,
         userId: this.userId,
         virtual: true,
+        workspaceId: this.workspaceId,
       })
       .returning();
 

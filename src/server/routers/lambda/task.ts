@@ -25,6 +25,7 @@ import { TaskReviewService } from '@/server/services/taskReview';
 
 const taskProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
+  const wsId = ctx.workspaceId ?? undefined;
   return opts.next({
     ctx: {
       agentModel: new AgentModel(ctx.serverDB, ctx.userId),
@@ -33,7 +34,7 @@ const taskProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
       taskModel: new TaskModel(ctx.serverDB, ctx.userId),
       taskService: new TaskService(ctx.serverDB, ctx.userId),
       taskTopicModel: new TaskTopicModel(ctx.serverDB, ctx.userId),
-      topicModel: new TopicModel(ctx.serverDB, ctx.userId),
+      topicModel: new TopicModel(ctx.serverDB, ctx.userId, wsId),
     },
   });
 });

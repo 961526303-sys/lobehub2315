@@ -9,10 +9,12 @@ import { FileModel } from './file';
 export class KnowledgeBaseModel {
   private userId: string;
   private db: LobeChatDatabase;
+  private workspaceId?: string;
 
-  constructor(db: LobeChatDatabase, userId: string) {
+  constructor(db: LobeChatDatabase, userId: string, workspaceId?: string) {
     this.userId = userId;
     this.db = db;
+    this.workspaceId = workspaceId;
   }
 
   // create
@@ -20,7 +22,7 @@ export class KnowledgeBaseModel {
   create = async (params: Omit<NewKnowledgeBase, 'userId'>) => {
     const [result] = await this.db
       .insert(knowledgeBases)
-      .values({ ...params, userId: this.userId })
+      .values({ ...params, userId: this.userId, workspaceId: this.workspaceId })
       .returning();
 
     return result;
