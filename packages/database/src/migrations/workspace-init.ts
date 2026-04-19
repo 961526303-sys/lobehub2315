@@ -27,7 +27,7 @@ const createPersonalWorkspaces = async (db: LobeChatDatabase) => {
     INSERT INTO workspaces (id, slug, name, type, owner_id, created_at, updated_at, accessed_at)
     SELECT
       'ws_' || substr(md5(random()::text || u.id), 1, 12),
-      'personal-' || substr(u.id, 1, 8),
+      'personal-' || u.id,
       COALESCE(u.username, 'Personal'),
       'personal',
       u.id,
@@ -37,7 +37,7 @@ const createPersonalWorkspaces = async (db: LobeChatDatabase) => {
       SELECT 1 FROM workspaces w WHERE w.owner_id = u.id AND w.type = 'personal'
     )
   `);
-  console.log(`[workspace-init] Created personal workspaces: ${result.rowCount} rows`);
+  console.info(`[workspace-init] Created personal workspaces: ${result.rowCount} rows`);
 };
 
 /**
@@ -54,7 +54,7 @@ const createOwnerMemberships = async (db: LobeChatDatabase) => {
         WHERE wm.workspace_id = w.id AND wm.user_id = w.owner_id
       )
   `);
-  console.log(`[workspace-init] Created owner memberships: ${result.rowCount} rows`);
+  console.info(`[workspace-init] Created owner memberships: ${result.rowCount} rows`);
 };
 
 /**
@@ -69,7 +69,8 @@ const backfillWorkspaceId = async (db: LobeChatDatabase, tableName: string) => {
   const pkColumn = getPrimaryKeyColumn(tableName);
 
   while (batchUpdated >= BATCH_SIZE) {
-    const result = await db.execute(sql.raw(`
+    const result = await db.execute(
+      sql.raw(`
       WITH batch AS (
         SELECT t.${pkColumn}
         FROM ${tableName} t
@@ -83,13 +84,14 @@ const backfillWorkspaceId = async (db: LobeChatDatabase, tableName: string) => {
       WHERE t.${pkColumn} = batch.${pkColumn}
         AND w.owner_id = t.user_id
         AND w.type = 'personal'
-    `));
+    `),
+    );
 
     batchUpdated = result.rowCount ?? 0;
     totalUpdated += batchUpdated;
   }
 
-  console.log(`[workspace-init] Backfilled ${tableName}: ${totalUpdated} rows`);
+  console.info(`[workspace-init] Backfilled ${tableName}: ${totalUpdated} rows`);
 };
 
 /**
@@ -124,7 +126,7 @@ const getPrimaryKeyColumn = (tableName: string): string => {
  * 3. Backfill workspace_id on all resource tables
  */
 export const runWorkspaceInitMigration = async (db: LobeChatDatabase) => {
-  console.log('[workspace-init] Starting workspace initialization migration...');
+  console.info('[workspace-init] Starting workspace initialization migration...');
 
   // Phase A: Create personal workspaces
   await createPersonalWorkspaces(db);
@@ -137,5 +139,5 @@ export const runWorkspaceInitMigration = async (db: LobeChatDatabase) => {
     await backfillWorkspaceId(db, tableName);
   }
 
-  console.log('[workspace-init] Workspace initialization migration completed.');
+  console.info('[workspace-init] Workspace initialization migration completed.');
 };
