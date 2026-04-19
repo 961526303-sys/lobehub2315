@@ -1,10 +1,9 @@
 'use client';
 
-import { Avatar, Icon } from '@lobehub/ui';
+import { Avatar, Flexbox, Icon } from '@lobehub/ui';
 import { Popover } from 'antd';
 import { ChevronsUpDown } from 'lucide-react';
-import { type PropsWithChildren, Suspense, memo, useState } from 'react';
-import { Flexbox } from 'react-layout-kit';
+import { memo, type PropsWithChildren, Suspense, useState } from 'react';
 
 import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
 
@@ -16,15 +15,15 @@ const WorkspaceSwitcher = memo<PropsWithChildren>(({ children }) => {
   return (
     <Popover
       arrow={false}
+      open={open}
+      placement="bottomLeft"
+      trigger="click"
       content={
         <Suspense>
           <WorkspaceSwitcherContent onClose={() => setOpen(false)} />
         </Suspense>
       }
       onOpenChange={setOpen}
-      open={open}
-      placement="bottomLeft"
-      trigger="click"
     >
       {children}
     </Popover>
@@ -47,18 +46,11 @@ export const WorkspaceTrigger = memo(() => {
   const type = (activeWorkspace?.type ?? 'personal') as 'personal' | 'team';
 
   return (
-    <Flexbox
-      align="center"
-      gap={8}
-      horizontal
-      style={{ cursor: 'pointer', padding: '4px 8px' }}
-    >
-      <Avatar
-        avatar={avatar || (type === 'personal' ? '👤' : '👥')}
-        shape="square"
-        size={24}
-      />
-      <span style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+    <Flexbox horizontal align="center" gap={8} style={{ cursor: 'pointer', padding: '4px 8px' }}>
+      <Avatar avatar={avatar || (type === 'personal' ? '👤' : '👥')} shape="square" size={24} />
+      <span
+        style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+      >
         {name}
       </span>
       <Icon icon={ChevronsUpDown} size={14} style={{ opacity: 0.5 }} />

@@ -1,7 +1,7 @@
 'use client';
 
+import { Flexbox } from '@lobehub/ui';
 import { memo } from 'react';
-import { Flexbox } from 'react-layout-kit';
 
 import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
 
@@ -22,15 +22,15 @@ const WorkspaceSwitcherContent = memo<WorkspaceSwitcherContentProps>(({ onClose 
   };
 
   return (
-    <Flexbox gap={4} style={{ maxHeight: 400, minWidth: 220, overflow: 'auto' }} padding={4}>
+    <Flexbox gap={4} padding={4} style={{ maxHeight: 400, minWidth: 220, overflow: 'auto' }}>
       {workspaces.map((workspace) => (
         <WorkspaceItem
           avatar={workspace.avatar}
           isActive={workspace.id === activeId}
           key={workspace.id}
           name={workspace.name}
-          onClick={() => handleSwitch(workspace.id)}
           type={workspace.type as 'personal' | 'team'}
+          onClick={() => handleSwitch(workspace.id)}
         />
       ))}
     </Flexbox>

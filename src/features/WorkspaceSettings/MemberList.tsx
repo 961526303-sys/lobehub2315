@@ -1,8 +1,7 @@
 'use client';
 
-import { Avatar, Tag } from '@lobehub/ui';
+import { Avatar, Flexbox, Tag } from '@lobehub/ui';
 import { memo } from 'react';
-import { Flexbox } from 'react-layout-kit';
 
 import { useWorkspaceStore } from '@/store/workspace';
 
@@ -28,9 +27,9 @@ const MemberList = memo(() => {
     <Flexbox gap={8}>
       {members.map((member) => (
         <Flexbox
+          horizontal
           align="center"
           gap={12}
-          horizontal
           key={`${member.workspaceId}-${member.userId}`}
           padding={'8px 0'}
         >

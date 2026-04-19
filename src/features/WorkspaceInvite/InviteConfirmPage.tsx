@@ -1,8 +1,8 @@
 'use client';
 
+import { Flexbox } from '@lobehub/ui';
 import { Button, Result, Spin } from 'antd';
 import { memo, useCallback, useState } from 'react';
-import { Flexbox } from 'react-layout-kit';
 
 import { lambdaClient } from '@/libs/trpc/client';
 import { useWorkspaceStore } from '@/store/workspace';
@@ -43,7 +43,11 @@ const InviteConfirmPage = memo<InviteConfirmPageProps>(({ token }) => {
     return (
       <Flexbox align="center" justify="center" style={{ height: '100vh' }}>
         <Result
-          extra={<Button href="/" type="primary">Go to Workspace</Button>}
+          extra={
+            <Button href="/" type="primary">
+              Go to Workspace
+            </Button>
+          }
           status="success"
           subTitle="You have been added to the workspace."
           title="Invitation Accepted"
@@ -68,14 +72,14 @@ const InviteConfirmPage = memo<InviteConfirmPageProps>(({ token }) => {
   return (
     <Flexbox align="center" justify="center" style={{ height: '100vh' }}>
       <Result
-        extra={
-          <Button onClick={handleAccept} type="primary">
-            Accept Invitation
-          </Button>
-        }
         status="info"
         subTitle="You have been invited to join a workspace."
         title="Workspace Invitation"
+        extra={
+          <Button type="primary" onClick={handleAccept}>
+            Accept Invitation
+          </Button>
+        }
       />
     </Flexbox>
   );
