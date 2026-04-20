@@ -1,10 +1,16 @@
 'use client';
 
+import { type SWRResponse } from 'swr';
+
+import { useClientDataSWR } from '@/libs/swr';
 import type { WorkspaceRole } from '@/server/utils/workspacePermissions';
+import { workspaceService } from '@/services/workspace';
 import { type StoreSetter } from '@/store/types';
 import { setNamespace } from '@/utils/storeDebug';
 
 import type { WorkspaceStore } from '../store';
+
+const FETCH_WORKSPACES_KEY = 'workspace/list';
 
 const n = setNamespace('workspace');
 
@@ -66,6 +72,21 @@ export class WorkspaceActionImpl {
 
   setWorkspaceLoading = (loading: boolean) => {
     this.#set({ isWorkspaceLoading: loading }, false, n('setWorkspaceLoading'));
+  };
+
+  useFetchWorkspaces = (
+    isLogin: boolean | undefined,
+  ): SWRResponse<WorkspaceStore['workspaces']> => {
+    return useClientDataSWR<WorkspaceStore['workspaces']>(
+      isLogin ? [FETCH_WORKSPACES_KEY] : null,
+      () => workspaceService.list() as Promise<WorkspaceStore['workspaces']>,
+      {
+        fallbackData: [],
+        onSuccess: (data) => {
+          this.setWorkspaces(data);
+        },
+      },
+    );
   };
 }
 

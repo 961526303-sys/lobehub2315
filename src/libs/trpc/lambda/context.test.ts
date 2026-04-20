@@ -180,6 +180,7 @@ describe('createLambdaContext', () => {
       name: 'Test API Key',
       updatedAt: new Date(),
       userId: 'api-user',
+      workspaceId: null,
     } satisfies NonNullable<Awaited<ReturnType<typeof ApiKeyModel.findByKey>>>;
 
     vi.mocked(ApiKeyModel.findByKey).mockResolvedValue(apiKeyRecord);

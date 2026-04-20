@@ -2,8 +2,6 @@ import { sql } from 'drizzle-orm';
 
 import type { LobeChatDatabase } from '../type';
 
-const BATCH_SIZE = 2000;
-
 const RESOURCE_TABLES = [
   'agents',
   'sessions',
@@ -58,62 +56,24 @@ const createOwnerMemberships = async (db: LobeChatDatabase) => {
 };
 
 /**
- * Phase C: Backfill workspace_id on resource tables in batches.
- * Uses a CTE to limit batch size since PostgreSQL UPDATE doesn't support LIMIT directly.
+ * Phase C: Backfill workspace_id on resource tables in a single UPDATE.
+ * One-time local migration — single statement is far faster than batched loops
+ * on large tables (avoids repeated seq scans when NULL fraction is high).
  */
 const backfillWorkspaceId = async (db: LobeChatDatabase, tableName: string) => {
-  let totalUpdated = 0;
-  let batchUpdated = BATCH_SIZE;
-
-  // Determine the primary key column(s) for this table
-  const pkColumn = getPrimaryKeyColumn(tableName);
-
-  while (batchUpdated >= BATCH_SIZE) {
-    const result = await db.execute(
-      sql.raw(`
-      WITH batch AS (
-        SELECT t.${pkColumn}
-        FROM ${tableName} t
-        WHERE t.workspace_id IS NULL
-          AND t.user_id IS NOT NULL
-        LIMIT ${BATCH_SIZE}
-      )
+  const result = await db.execute(
+    sql.raw(`
       UPDATE ${tableName} t
       SET workspace_id = w.id
-      FROM batch, workspaces w
-      WHERE t.${pkColumn} = batch.${pkColumn}
+      FROM workspaces w
+      WHERE t.workspace_id IS NULL
+        AND t.user_id IS NOT NULL
         AND w.owner_id = t.user_id
         AND w.type = 'personal'
     `),
-    );
+  );
 
-    batchUpdated = result.rowCount ?? 0;
-    totalUpdated += batchUpdated;
-  }
-
-  console.info(`[workspace-init] Backfilled ${tableName}: ${totalUpdated} rows`);
-};
-
-/**
- * Get the primary key column name for a table.
- * Most tables use 'id', but some composite-PK tables need special handling.
- */
-const getPrimaryKeyColumn = (tableName: string): string => {
-  // These tables have composite primary keys but still have a unique user_id + id combination
-  // For the CTE-based batch update, we use a column that can uniquely identify rows
-  switch (tableName) {
-    case 'ai_providers': {
-      // Composite PK: (id, user_id) — use ctid as row identifier
-      return 'ctid';
-    }
-    case 'ai_models': {
-      // Composite PK: (id, provider_id, user_id) — use ctid
-      return 'ctid';
-    }
-    default: {
-      return 'id';
-    }
-  }
+  console.info(`[workspace-init] Backfilled ${tableName}: ${result.rowCount ?? 0} rows`);
 };
 
 /**

@@ -1,6 +1,6 @@
+import { Flexbox } from '@lobehub/ui';
 import { Alert } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { Flexbox } from 'react-layout-kit';
 
 import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
 

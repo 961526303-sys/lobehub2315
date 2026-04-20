@@ -16,6 +16,7 @@ import DataStatistics from '../DataStatistics';
 import UserLoginOrSignup from '../UserLoginOrSignup';
 import LangButton from './LangButton';
 import { useMenu } from './useMenu';
+import WorkspaceSection from './WorkspaceSection';
 
 const PanelContent: FC<{ closePopover: () => void }> = ({ closePopover }) => {
   const isLoginWithAuth = useUserStore(authSelectors.isLoginWithAuth);
@@ -56,6 +57,7 @@ const PanelContent: FC<{ closePopover: () => void }> = ({ closePopover }) => {
             <DataStatistics />
           </Link>
           {ENABLE_BUSINESS_FEATURES && <BusinessPanelContent />}
+          <WorkspaceSection onSwitch={closePopover} />
         </>
       ) : (
         <UserLoginOrSignup onClick={handleSignIn} />
