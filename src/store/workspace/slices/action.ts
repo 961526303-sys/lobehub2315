@@ -10,7 +10,7 @@ import { setNamespace } from '@/utils/storeDebug';
 
 import type { WorkspaceStore } from '../store';
 
-const FETCH_WORKSPACES_KEY = 'workspace/list';
+export const FETCH_WORKSPACES_KEY = 'workspace/list';
 
 const n = setNamespace('workspace');
 

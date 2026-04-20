@@ -3,10 +3,12 @@
 import { Avatar, Flexbox, Icon, Text } from '@lobehub/ui';
 import { type ItemType } from 'antd/es/menu/interface';
 import { createStaticStyles } from 'antd-style';
-import { Check } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Menu from '@/components/Menu';
+import { createWorkspaceModal } from '@/features/CreateWorkspaceModal';
 import { useUserStore } from '@/store/user';
 import { userProfileSelectors } from '@/store/user/selectors';
 import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
@@ -29,6 +31,7 @@ interface WorkspaceSectionProps {
 }
 
 const WorkspaceSection = memo<WorkspaceSectionProps>(({ onSwitch }) => {
+  const { t } = useTranslation('setting');
   const email = useUserStore(userProfileSelectors.email);
   const userAvatar = useUserStore(userProfileSelectors.userAvatar);
   const displayUserName = useUserStore(userProfileSelectors.displayUserName);
@@ -37,7 +40,7 @@ const WorkspaceSection = memo<WorkspaceSectionProps>(({ onSwitch }) => {
   const switchWorkspace = useWorkspaceStore((s) => s.switchWorkspace);
 
   const items = useMemo<ItemType[]>(() => {
-    return workspaces.map((workspace) => {
+    const workspaceItems: ItemType[] = workspaces.map((workspace) => {
       const isPersonal = workspace.type === 'personal';
       const avatar = workspace.avatar || (isPersonal ? userAvatar : null);
       const name = isPersonal ? displayUserName || workspace.name : workspace.name;
@@ -58,9 +61,21 @@ const WorkspaceSection = memo<WorkspaceSectionProps>(({ onSwitch }) => {
         },
       };
     });
-  }, [workspaces, activeId, userAvatar, displayUserName, switchWorkspace, onSwitch]);
 
-  if (items.length === 0) return null;
+    workspaceItems.push({
+      icon: <Icon icon={Plus} />,
+      key: 'new-workspace',
+      label: t('workspace.newWorkspace'),
+      onClick: () => {
+        onSwitch?.();
+        createWorkspaceModal();
+      },
+    });
+
+    return workspaceItems;
+  }, [workspaces, activeId, userAvatar, displayUserName, switchWorkspace, onSwitch, t]);
+
+  if (workspaces.length === 0) return null;
 
   return (
     <>
