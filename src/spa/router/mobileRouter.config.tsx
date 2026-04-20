@@ -218,16 +218,6 @@ export const mobileRoutes: RouteObject[] = [
         path: 'settings',
       },
 
-      // Workspace invitation acceptance
-      {
-        element: dynamicElement(
-          () => import('@/routes/(main)/invite/[token]'),
-          'Mobile > Invite > Accept',
-        ),
-        errorElement: <ErrorBoundary />,
-        path: 'invite/:token',
-      },
-
       ...BusinessMobileRoutesWithMainLayout,
 
       // Me routes (mobile personal center)

@@ -348,16 +348,6 @@ export const desktopRoutes: RouteObject[] = [
         path: 'settings',
       },
 
-      // Workspace invitation acceptance
-      {
-        element: dynamicElement(
-          () => import('@/routes/(main)/invite/[token]'),
-          'Desktop > Invite > Accept',
-        ),
-        errorElement: <ErrorBoundary />,
-        path: 'invite/:token',
-      },
-
       // Memory routes
       {
         children: [

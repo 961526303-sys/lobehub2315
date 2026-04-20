@@ -5,7 +5,6 @@ import {
   authedProcedure,
   router,
   workspaceAdminProcedure,
-  workspaceOwnerProcedure,
   workspaceProcedure,
 } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
@@ -34,31 +33,7 @@ const wsAdminProcedure = workspaceAdminProcedure.use(serverDatabase).use(async (
   });
 });
 
-const wsOwnerProcedure = workspaceOwnerProcedure.use(serverDatabase).use(async (opts) => {
-  const { ctx } = opts;
-
-  return opts.next({
-    ctx: { workspaceModel: new WorkspaceModel(ctx.serverDB, ctx.userId) },
-  });
-});
-
 export const workspaceRouter = router({
-  create: wsAuthedProcedure
-    .input(
-      z.object({
-        avatar: z.string().optional(),
-        description: z.string().max(1000).optional(),
-        name: z.string().min(1).max(255),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      return ctx.workspaceModel.create(input);
-    }),
-
-  delete: wsOwnerProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
-    return ctx.workspaceModel.delete(input.id);
-  }),
-
   getById: wsProcedure.query(async ({ ctx }) => {
     if (!ctx.workspaceId) return null;
     return ctx.workspaceModel.findById(ctx.workspaceId);
@@ -92,13 +67,6 @@ export const workspaceRouter = router({
     .mutation(async ({ input, ctx }) => {
       if (!ctx.workspaceId) return;
       return ctx.workspaceModel.updateSettings(ctx.workspaceId, input.settings);
-    }),
-
-  upgradeToTeam: wsOwnerProcedure
-    .input(z.object({ name: z.string().min(1).max(255).optional() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.workspaceId) throw new Error('No active workspace');
-      return ctx.workspaceModel.upgradeToTeam(ctx.workspaceId, input);
     }),
 });
 
