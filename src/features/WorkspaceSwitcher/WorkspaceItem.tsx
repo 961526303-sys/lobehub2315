@@ -1,8 +1,27 @@
 'use client';
 
 import { Avatar, Flexbox, Icon } from '@lobehub/ui';
+import { createStaticStyles } from 'antd-style';
 import { Check } from 'lucide-react';
 import { memo } from 'react';
+
+const styles = createStaticStyles(({ css, cssVar }) => ({
+  item: css`
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: ${cssVar.colorFillTertiary};
+    }
+  `,
+  name: css`
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `,
+}));
 
 interface WorkspaceItemProps {
   avatar?: string | null;
@@ -17,16 +36,13 @@ const WorkspaceItem = memo<WorkspaceItemProps>(({ avatar, name, type, isActive, 
     <Flexbox
       horizontal
       align="center"
+      className={styles.item}
       gap={8}
       padding={'8px 12px'}
-      style={{ borderRadius: 6, cursor: 'pointer' }}
       onClick={onClick}
     >
       <Avatar avatar={avatar || (type === 'personal' ? '👤' : '👥')} shape="square" size={28} />
-      <Flexbox
-        flex={1}
-        style={{ fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-      >
+      <Flexbox className={styles.name} flex={1}>
         {name}
       </Flexbox>
       {isActive && <Icon icon={Check} size={16} />}
