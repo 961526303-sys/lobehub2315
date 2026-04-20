@@ -6,6 +6,7 @@ import { referralRouter } from '@/business/server/lambda-routers/referral';
 import { spendRouter } from '@/business/server/lambda-routers/spend';
 import { subscriptionRouter } from '@/business/server/lambda-routers/subscription';
 import { topUpRouter } from '@/business/server/lambda-routers/topUp';
+import { workspaceRouter } from '@/business/server/lambda-routers/workspace';
 import { workspaceAuditLogRouter } from '@/business/server/lambda-routers/workspaceAuditLog';
 import { workspaceDataRouter } from '@/business/server/lambda-routers/workspaceData';
 import { workspaceMemberRouter } from '@/business/server/lambda-routers/workspaceMember';
@@ -65,7 +66,6 @@ import { userRouter } from './user';
 import { userMemoriesRouter } from './userMemories';
 import { userMemoryRouter } from './userMemory';
 import { videoRouter } from './video';
-import { workspaceRouter } from './workspace';
 
 export const lambdaRouter = router({
   agent: agentRouter,
