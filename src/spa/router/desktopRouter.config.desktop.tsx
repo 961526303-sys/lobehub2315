@@ -50,6 +50,7 @@ import EvalCaseDetailPage from '@/routes/(main)/eval/bench/[benchmarkId]/runs/[r
 import GroupPage from '@/routes/(main)/group';
 import DesktopGroupLayout from '@/routes/(main)/group/_layout';
 import GroupProfilePage from '@/routes/(main)/group/profile';
+import InviteAcceptPage from '@/routes/(main)/invite/[token]';
 import DesktopMemoryLayout from '@/routes/(main)/memory/_layout';
 import MemoryHomePage from '@/routes/(main)/memory/(home)';
 import MemoryActivitiesPage from '@/routes/(main)/memory/activities';
@@ -299,6 +300,13 @@ export const desktopRoutes: RouteObject[] = [
         element: <SettingsLayout />,
         errorElement: <ErrorBoundary />,
         path: 'settings',
+      },
+
+      // Workspace invitation acceptance
+      {
+        element: <InviteAcceptPage />,
+        errorElement: <ErrorBoundary />,
+        path: 'invite/:token',
       },
 
       // Memory routes

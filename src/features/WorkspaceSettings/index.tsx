@@ -7,14 +7,15 @@ import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
 
 import GeneralSettings from './GeneralSettings';
 import MemberList from './MemberList';
+import UpgradeToTeams from './UpgradeToTeams';
 
 const WorkspaceSettings = memo(() => {
-  const isTeam = useWorkspaceStore(workspaceSelectors.isTeamWorkspace);
+  const isPersonal = useWorkspaceStore(workspaceSelectors.isPersonalWorkspace);
 
   return (
     <Flexbox gap={24}>
       <GeneralSettings />
-      {isTeam && <MemberList />}
+      {isPersonal ? <UpgradeToTeams /> : <MemberList />}
     </Flexbox>
   );
 });

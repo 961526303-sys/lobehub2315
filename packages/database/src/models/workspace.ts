@@ -1,6 +1,6 @@
 import { and, desc, eq } from 'drizzle-orm';
 
-import type { NewWorkspace, WorkspaceItem } from '../schemas';
+import type { WorkspaceItem } from '../schemas';
 import { workspaceMembers, workspaces } from '../schemas';
 import type { LobeChatDatabase } from '../type';
 import { idGenerator } from '../utils/idGenerator';
@@ -42,7 +42,11 @@ export class WorkspaceModel {
     return this.db
       .delete(workspaces)
       .where(
-        and(eq(workspaces.id, id), eq(workspaces.ownerId, this.userId), eq(workspaces.type, 'team')),
+        and(
+          eq(workspaces.id, id),
+          eq(workspaces.ownerId, this.userId),
+          eq(workspaces.type, 'team'),
+        ),
       );
   };
 
@@ -92,7 +96,10 @@ export class WorkspaceModel {
     }));
   };
 
-  update = async (id: string, value: Partial<Pick<WorkspaceItem, 'avatar' | 'description' | 'name' | 'slug'>>) => {
+  update = async (
+    id: string,
+    value: Partial<Pick<WorkspaceItem, 'avatar' | 'description' | 'name' | 'slug'>>,
+  ) => {
     return this.db
       .update(workspaces)
       .set({ ...value, updatedAt: new Date() })
@@ -104,6 +111,29 @@ export class WorkspaceModel {
       .update(workspaces)
       .set({ settings, updatedAt: new Date() })
       .where(eq(workspaces.id, id));
+  };
+
+  upgradeToTeam = async (id: string, params: { name?: string } = {}) => {
+    const current = await this.db.query.workspaces.findFirst({
+      where: eq(workspaces.id, id),
+    });
+
+    if (!current) throw new Error('Workspace not found');
+    if (current.ownerId !== this.userId)
+      throw new Error('Only the owner can upgrade this workspace');
+    if (current.type !== 'personal') throw new Error('Only personal workspaces can be upgraded');
+
+    const [updated] = await this.db
+      .update(workspaces)
+      .set({
+        ...(params.name ? { name: params.name } : {}),
+        type: 'team',
+        updatedAt: new Date(),
+      })
+      .where(eq(workspaces.id, id))
+      .returning();
+
+    return updated;
   };
 
   private genId = () => idGenerator('workspaces');

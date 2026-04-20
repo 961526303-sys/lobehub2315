@@ -11,6 +11,7 @@ import { setNamespace } from '@/utils/storeDebug';
 import type { WorkspaceStore } from '../store';
 
 export const FETCH_WORKSPACES_KEY = 'workspace/list';
+export const FETCH_WORKSPACE_MEMBERS_KEY = 'workspace/members';
 
 const n = setNamespace('workspace');
 
@@ -84,6 +85,27 @@ export class WorkspaceActionImpl {
         fallbackData: [],
         onSuccess: (data) => {
           this.setWorkspaces(data);
+        },
+      },
+    );
+  };
+
+  useFetchWorkspaceMembers = (
+    enabled: boolean,
+    workspaceId: string | null,
+    currentUserId?: string,
+  ): SWRResponse<WorkspaceStore['members']> => {
+    return useClientDataSWR<WorkspaceStore['members']>(
+      enabled && workspaceId ? [FETCH_WORKSPACE_MEMBERS_KEY, workspaceId] : null,
+      () => workspaceService.listMembers() as Promise<WorkspaceStore['members']>,
+      {
+        fallbackData: [],
+        onSuccess: (data) => {
+          this.setMembers(data);
+          if (currentUserId) {
+            const mine = data.find((m) => m.userId === currentUserId);
+            this.setMyRole((mine?.role as WorkspaceRole) ?? null);
+          }
         },
       },
     );

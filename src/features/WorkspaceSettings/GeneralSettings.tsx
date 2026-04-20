@@ -10,7 +10,6 @@ import { useWorkspaceStore, workspaceSelectors } from '@/store/workspace';
 const GeneralSettings = memo(() => {
   const { t } = useTranslation('setting');
   const activeWorkspace = useWorkspaceStore(workspaceSelectors.activeWorkspace);
-  const isTeam = useWorkspaceStore(workspaceSelectors.isTeamWorkspace);
 
   if (!activeWorkspace) return null;
 
@@ -32,12 +31,12 @@ const GeneralSettings = memo(() => {
 
   return (
     <Form
+      items={[generalItems]}
+      itemsType="group"
       initialValues={{
         description: activeWorkspace.description ?? '',
         name: activeWorkspace.name,
       }}
-      items={[generalItems]}
-      itemsType="group"
     />
   );
 });

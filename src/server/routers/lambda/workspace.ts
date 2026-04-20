@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
 import { WorkspaceModel } from '@/database/models/workspace';
-import { authedProcedure, router, workspaceAdminProcedure, workspaceOwnerProcedure, workspaceProcedure } from '@/libs/trpc/lambda';
+import {
+  authedProcedure,
+  router,
+  workspaceAdminProcedure,
+  workspaceOwnerProcedure,
+  workspaceProcedure,
+} from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
 
 const wsAuthedProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
@@ -49,11 +55,9 @@ export const workspaceRouter = router({
       return ctx.workspaceModel.create(input);
     }),
 
-  delete: wsOwnerProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      return ctx.workspaceModel.delete(input.id);
-    }),
+  delete: wsOwnerProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
+    return ctx.workspaceModel.delete(input.id);
+  }),
 
   getById: wsProcedure.query(async ({ ctx }) => {
     if (!ctx.workspaceId) return null;
@@ -88,6 +92,13 @@ export const workspaceRouter = router({
     .mutation(async ({ input, ctx }) => {
       if (!ctx.workspaceId) return;
       return ctx.workspaceModel.updateSettings(ctx.workspaceId, input.settings);
+    }),
+
+  upgradeToTeam: wsOwnerProcedure
+    .input(z.object({ name: z.string().min(1).max(255).optional() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.workspaceId) throw new Error('No active workspace');
+      return ctx.workspaceModel.upgradeToTeam(ctx.workspaceId, input);
     }),
 });
 
