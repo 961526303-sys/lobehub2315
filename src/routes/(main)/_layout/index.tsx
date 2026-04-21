@@ -18,7 +18,7 @@ import AuthRequiredModal from '@/features/Electron/AuthRequiredModal';
 import TitleBar from '@/features/Electron/titlebar/TitleBar';
 import HotkeyHelperPanel from '@/features/HotkeyHelperPanel';
 import NavPanel from '@/features/NavPanel';
-import WorkspaceContextProvider from '@/features/WorkspaceContext';
+import WorkspaceContextSlot from '@/business/client/WorkspaceContextSlot';
 import { useFeedbackModal } from '@/hooks/useFeedbackModal';
 import { usePlatform } from '@/hooks/usePlatform';
 import { MarketAuthProvider } from '@/layout/AuthProvider/MarketAuth';
@@ -49,7 +49,7 @@ const Layout: FC = () => {
 
   return (
     <HotkeysProvider initiallyActiveScopes={[HotkeyScopeEnum.Global]}>
-      <WorkspaceContextProvider>
+      <WorkspaceContextSlot>
         <Suspense fallback={null}>
           {isDesktop && <DesktopAutoOidcOnFirstOpen />}
           {isDesktop && <DesktopNavigationBridge />}
@@ -99,7 +99,7 @@ const Layout: FC = () => {
             </Suspense>
           )}
         </Suspense>
-      </WorkspaceContextProvider>
+      </WorkspaceContextSlot>
     </HotkeysProvider>
   );
 };

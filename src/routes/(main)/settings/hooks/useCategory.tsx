@@ -87,7 +87,7 @@ export const useCategory = () => {
         key: SettingsTabs.Profile,
         label: username ? username : tAuth('tab.profile'),
       },
-      {
+      enableBusinessFeatures && {
         icon: Building2,
         key: SettingsTabs.Workspace,
         label: t('tab.workspace'),

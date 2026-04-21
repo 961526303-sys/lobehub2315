@@ -4,6 +4,7 @@ import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import BusinessPanelContent from '@/business/client/features/User/BusinessPanelContent';
+import UserPanelWorkspaceSection from '@/business/client/features/User/UserPanelWorkspaceSection';
 import Menu from '@/components/Menu';
 import { isDesktop } from '@/const/version';
 import UserInfo from '@/features/User/UserInfo';
@@ -16,7 +17,6 @@ import DataStatistics from '../DataStatistics';
 import UserLoginOrSignup from '../UserLoginOrSignup';
 import LangButton from './LangButton';
 import { useMenu } from './useMenu';
-import WorkspaceSection from './WorkspaceSection';
 
 const PanelContent: FC<{ closePopover: () => void }> = ({ closePopover }) => {
   const isLoginWithAuth = useUserStore(authSelectors.isLoginWithAuth);
@@ -57,7 +57,7 @@ const PanelContent: FC<{ closePopover: () => void }> = ({ closePopover }) => {
             <DataStatistics />
           </Link>
           {ENABLE_BUSINESS_FEATURES && <BusinessPanelContent />}
-          <WorkspaceSection onSwitch={closePopover} />
+          <UserPanelWorkspaceSection onSwitch={closePopover} />
         </>
       ) : (
         <UserLoginOrSignup onClick={handleSignIn} />

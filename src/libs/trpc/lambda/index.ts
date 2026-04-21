@@ -12,7 +12,6 @@ import { openTelemetry } from '../middleware/openTelemetry';
 import { userAuth } from '../middleware/userAuth';
 import { trpc } from './init';
 import { oidcAuth } from './middleware/oidcAuth';
-import { requireWorkspaceRole, workspaceAuth } from './middleware/workspace';
 
 /**
  * Create a router
@@ -30,11 +29,6 @@ export const publicProcedure = baseProcedure;
 
 // procedure that asserts that the user is logged in
 export const authedProcedure = baseProcedure.use(oidcAuth).use(userAuth);
-
-// workspace-aware procedures (validates membership, injects workspaceId + role)
-export const workspaceProcedure = authedProcedure.use(workspaceAuth);
-export const workspaceAdminProcedure = workspaceProcedure.use(requireWorkspaceRole('admin'));
-export const workspaceOwnerProcedure = workspaceProcedure.use(requireWorkspaceRole('owner'));
 
 /**
  * Create a server-side caller

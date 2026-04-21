@@ -81,7 +81,10 @@ export const componentMap = {
       loading: loading('Settings > Referral'),
     },
   ),
-  [SettingsTabs.Workspace]: dynamic(() => import('../workspace'), {
-    loading: loading('Settings > Workspace'),
-  }),
+  [SettingsTabs.Workspace]: dynamic(
+    () => import('@/business/client/BusinessSettingPages/Workspace'),
+    {
+      loading: loading('Settings > Workspace'),
+    },
+  ),
 };

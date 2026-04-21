@@ -131,12 +131,10 @@ const linkOptions = {
     // For other operations (like knowledge base embedding), let server use its own config
     const headers = await createHeaderWithAuth(provider ? { provider } : undefined);
 
-    // Inject workspace context header
-    const { getWorkspaceStoreState } = await import('@/store/workspace');
-    const workspaceId = getWorkspaceStoreState().activeWorkspaceId;
-    if (workspaceId) {
-      (headers as Record<string, string>)['X-Workspace-Id'] = workspaceId;
-    }
+    // Let business layer contribute extra headers (e.g. workspace context in Cloud).
+    // Community ships an empty stub at this slot.
+    const { getBusinessTrpcHeaders } = await import('@/business/client/trpc-headers');
+    Object.assign(headers as Record<string, string>, await getBusinessTrpcHeaders());
 
     log('Headers: %O', headers);
     return headers;
