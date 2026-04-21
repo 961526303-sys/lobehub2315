@@ -697,15 +697,8 @@
     {
       "idx": 99,
       "version": "7",
-      "when": 1776617821108,
-      "tag": "0099_add_workspace",
-      "breakpoints": true
-    },
-    {
-      "idx": 100,
-      "version": "7",
-      "when": 1776749854928,
-      "tag": "0100_drop_workspace_tables",
+      "when": 1776760489344,
+      "tag": "0099_add_workspace_id",
       "breakpoints": true
     }
   ],
