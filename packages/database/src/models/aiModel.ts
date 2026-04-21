@@ -22,6 +22,9 @@ export class AiModelModel {
     this.workspaceId = workspaceId;
   }
 
+  private scopeWorkspace = () =>
+    this.workspaceId ? eq(aiModels.workspaceId, this.workspaceId) : undefined;
+
   /**
    * Helper method to validate if array is empty and return early if needed
    * @param array - Array to validate
@@ -54,18 +57,21 @@ export class AiModelModel {
           eq(aiModels.id, id),
           eq(aiModels.providerId, providerId),
           eq(aiModels.userId, this.userId),
+          this.scopeWorkspace(),
         ),
       );
   };
 
   deleteAll = async () => {
-    return this.db.delete(aiModels).where(eq(aiModels.userId, this.userId));
+    return this.db
+      .delete(aiModels)
+      .where(and(eq(aiModels.userId, this.userId), this.scopeWorkspace()));
   };
 
   query = async () => {
     return this.db.query.aiModels.findMany({
       orderBy: [desc(aiModels.updatedAt)],
-      where: eq(aiModels.userId, this.userId),
+      where: and(eq(aiModels.userId, this.userId), this.scopeWorkspace()),
     });
   };
 
@@ -87,7 +93,13 @@ export class AiModelModel {
         type: aiModels.type,
       })
       .from(aiModels)
-      .where(and(eq(aiModels.providerId, providerId), eq(aiModels.userId, this.userId)))
+      .where(
+        and(
+          eq(aiModels.providerId, providerId),
+          eq(aiModels.userId, this.userId),
+          this.scopeWorkspace(),
+        ),
+      )
       .orderBy(
         asc(aiModels.sort),
         desc(aiModels.enabled),
@@ -116,14 +128,14 @@ export class AiModelModel {
         type: aiModels.type,
       })
       .from(aiModels)
-      .where(and(eq(aiModels.userId, this.userId)));
+      .where(and(eq(aiModels.userId, this.userId), this.scopeWorkspace()));
 
     return data as EnabledAiModel[];
   };
 
   findById = async (id: string) => {
     return this.db.query.aiModels.findFirst({
-      where: and(eq(aiModels.id, id), eq(aiModels.userId, this.userId)),
+      where: and(eq(aiModels.id, id), eq(aiModels.userId, this.userId), this.scopeWorkspace()),
     });
   };
 
@@ -241,6 +253,7 @@ export class AiModelModel {
           eq(aiModels.providerId, providerId),
           eq(aiModels.source, AiModelSourceEnum.Remote),
           eq(aiModels.userId, this.userId),
+          this.scopeWorkspace(),
         ),
       );
   }
@@ -248,7 +261,13 @@ export class AiModelModel {
   clearModelsByProvider(providerId: string) {
     return this.db
       .delete(aiModels)
-      .where(and(eq(aiModels.providerId, providerId), eq(aiModels.userId, this.userId)));
+      .where(
+        and(
+          eq(aiModels.providerId, providerId),
+          eq(aiModels.userId, this.userId),
+          this.scopeWorkspace(),
+        ),
+      );
   }
 
   updateModelsOrder = async (providerId: string, sortMap: AiModelSortMap[]) => {

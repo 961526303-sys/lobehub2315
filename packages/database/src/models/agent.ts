@@ -29,9 +29,12 @@ export class AgentModel {
     this.workspaceId = workspaceId;
   }
 
+  private scopeWorkspace = () =>
+    this.workspaceId ? eq(agents.workspaceId, this.workspaceId) : undefined;
+
   getAgentConfigById = async (id: string) => {
     const agent = await this.db.query.agents.findFirst({
-      where: and(eq(agents.id, id), eq(agents.userId, this.userId)),
+      where: and(eq(agents.id, id), eq(agents.userId, this.userId), this.scopeWorkspace()),
     });
 
     if (!agent) return null;
@@ -49,6 +52,7 @@ export class AgentModel {
     // Include agents where virtual is false OR null (legacy data without virtual field)
     const baseConditions = and(
       eq(agents.userId, this.userId),
+      this.scopeWorkspace(),
       or(eq(agents.virtual, false), isNull(agents.virtual)),
     );
 
@@ -107,6 +111,7 @@ export class AgentModel {
     const agent = await this.db.query.agents.findFirst({
       where: and(
         eq(agents.userId, this.userId),
+        this.scopeWorkspace(),
         or(eq(agents.id, idOrSlug), eq(agents.slug, idOrSlug)),
       ),
     });
@@ -302,7 +307,11 @@ export class AgentModel {
       }
 
       // 4. Delete the agent itself
-      return trx.delete(agents).where(and(eq(agents.id, agentId), eq(agents.userId, this.userId)));
+      return trx
+        .delete(agents)
+        .where(
+          and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
+        );
     });
   };
 
@@ -316,7 +325,9 @@ export class AgentModel {
 
     return this.db
       .delete(agents)
-      .where(and(eq(agents.userId, this.userId), inArray(agents.id, agentIds)));
+      .where(
+        and(eq(agents.userId, this.userId), this.scopeWorkspace(), inArray(agents.id, agentIds)),
+      );
   };
 
   toggleFile = async (agentId: string, fileId: string, enabled?: boolean) => {
@@ -376,7 +387,9 @@ export class AgentModel {
     return this.db
       .update(agents)
       .set({ ...data, updatedAt: new Date() })
-      .where(and(eq(agents.id, agentId), eq(agents.userId, this.userId)));
+      .where(
+        and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
+      );
   };
 
   touchUpdatedAt = async (agentId: string) => {
@@ -389,7 +402,11 @@ export class AgentModel {
    */
   checkByMarketIdentifier = async (marketIdentifier: string): Promise<boolean> => {
     const result = await this.db.query.agents.findFirst({
-      where: and(eq(agents.marketIdentifier, marketIdentifier), eq(agents.userId, this.userId)),
+      where: and(
+        eq(agents.marketIdentifier, marketIdentifier),
+        eq(agents.userId, this.userId),
+        this.scopeWorkspace(),
+      ),
     });
     return !!result;
   };
@@ -403,7 +420,11 @@ export class AgentModel {
     const result = await this.db.query.agents.findFirst({
       columns: { id: true },
       orderBy: (agents, { desc }) => [desc(agents.updatedAt)],
-      where: and(eq(agents.marketIdentifier, marketIdentifier), eq(agents.userId, this.userId)),
+      where: and(
+        eq(agents.marketIdentifier, marketIdentifier),
+        eq(agents.userId, this.userId),
+        this.scopeWorkspace(),
+      ),
     });
     return result?.id ?? null;
   };
@@ -419,6 +440,7 @@ export class AgentModel {
       orderBy: (agents, { desc }) => [desc(agents.updatedAt)],
       where: and(
         eq(agents.userId, this.userId),
+        this.scopeWorkspace(),
         sql`${agents.params}->>'forkedFromIdentifier' = ${forkedFromIdentifier}`,
       ),
     });
@@ -429,7 +451,7 @@ export class AgentModel {
     if (!data || Object.keys(data).length === 0) return;
 
     const agent = await this.db.query.agents.findFirst({
-      where: and(eq(agents.id, agentId), eq(agents.userId, this.userId)),
+      where: and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
     });
 
     if (!agent) return;
@@ -482,7 +504,9 @@ export class AgentModel {
     return this.db
       .update(agents)
       .set(updateData)
-      .where(and(eq(agents.id, agentId), eq(agents.userId, this.userId)));
+      .where(
+        and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
+      );
   };
 
   /**
@@ -492,7 +516,9 @@ export class AgentModel {
     const result = await this.db
       .update(agents)
       .set({ sessionGroupId, updatedAt: new Date() })
-      .where(and(eq(agents.id, agentId), eq(agents.userId, this.userId)))
+      .where(
+        and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
+      )
       .returning();
 
     return result[0];
@@ -505,7 +531,7 @@ export class AgentModel {
   duplicate = async (agentId: string, newTitle?: string): Promise<{ agentId: string } | null> => {
     // Get the source agent
     const sourceAgent = await this.db.query.agents.findFirst({
-      where: and(eq(agents.id, agentId), eq(agents.userId, this.userId)),
+      where: and(eq(agents.id, agentId), eq(agents.userId, this.userId), this.scopeWorkspace()),
     });
 
     if (!sourceAgent) return null;
@@ -553,7 +579,7 @@ export class AgentModel {
   getBuiltinAgent = async (slug: string): Promise<AgentItem | null> => {
     // 1. First try to find existing agent by slug
     const existing = await this.db.query.agents.findFirst({
-      where: and(eq(agents.slug, slug), eq(agents.userId, this.userId)),
+      where: and(eq(agents.slug, slug), eq(agents.userId, this.userId), this.scopeWorkspace()),
     });
 
     if (existing) return existing;
@@ -563,12 +589,21 @@ export class AgentModel {
     // If found, update the agent's slug to 'inbox' for future direct queries
     if (slug === INBOX_SESSION_ID) {
       // Use join query for better performance instead of multiple findFirst calls
+      const sessionWorkspaceScope = this.workspaceId
+        ? eq(sessions.workspaceId, this.workspaceId)
+        : undefined;
       const result = await this.db
         .select({ agent: agents })
         .from(sessions)
         .innerJoin(agentsToSessions, eq(sessions.id, agentsToSessions.sessionId))
         .innerJoin(agents, eq(agentsToSessions.agentId, agents.id))
-        .where(and(eq(sessions.slug, INBOX_SESSION_ID), eq(sessions.userId, this.userId)))
+        .where(
+          and(
+            eq(sessions.slug, INBOX_SESSION_ID),
+            eq(sessions.userId, this.userId),
+            sessionWorkspaceScope,
+          ),
+        )
         .limit(1);
 
       if (result.length > 0 && result[0].agent) {

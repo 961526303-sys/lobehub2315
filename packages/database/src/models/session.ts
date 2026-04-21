@@ -28,6 +28,15 @@ export class SessionModel {
     this.db = db;
     this.workspaceId = workspaceId;
   }
+
+  private scopeWorkspace = () =>
+    this.workspaceId ? eq(sessions.workspaceId, this.workspaceId) : undefined;
+
+  private scopeTopicWorkspace = () =>
+    this.workspaceId ? eq(topics.workspaceId, this.workspaceId) : undefined;
+
+  private scopeAgentWorkspace = () =>
+    this.workspaceId ? eq(agents.workspaceId, this.workspaceId) : undefined;
   // **************** Query *************** //
 
   query = async ({ current = 0, pageSize = 9999 } = {}) => {
@@ -47,7 +56,13 @@ export class SessionModel {
       .leftJoin(agentsToSessions, eq(sessions.id, agentsToSessions.sessionId))
       .leftJoin(agents, eq(agentsToSessions.agentId, agents.id))
       .leftJoin(sessionGroups, eq(sessions.groupId, sessionGroups.id))
-      .where(and(eq(sessions.userId, this.userId), not(eq(sessions.slug, INBOX_SESSION_ID))))
+      .where(
+        and(
+          eq(sessions.userId, this.userId),
+          this.scopeWorkspace(),
+          not(eq(sessions.slug, INBOX_SESSION_ID)),
+        ),
+      )
       .orderBy(desc(sessions.updatedAt))
       .limit(pageSize)
       .offset(offset);
@@ -79,7 +94,7 @@ export class SessionModel {
 
     const groups = await this.db.query.sessionGroups.findMany({
       orderBy: [asc(sessionGroups.sort), desc(sessionGroups.createdAt)],
-      where: eq(sessions.userId, this.userId),
+      where: and(eq(sessions.userId, this.userId), this.scopeWorkspace()),
     });
 
     const mappedSessions = result.map((item) => this.mapSessionItem(item as any));
@@ -115,6 +130,7 @@ export class SessionModel {
         and(
           or(eq(sessions.id, idOrSlug), eq(sessions.slug, idOrSlug)),
           eq(sessions.userId, this.userId),
+          this.scopeWorkspace(),
         ),
       )
       .leftJoin(agentsToSessions, eq(sessions.id, agentsToSessions.sessionId))
@@ -140,6 +156,7 @@ export class SessionModel {
       .where(
         genWhere([
           eq(sessions.userId, this.userId),
+          this.scopeWorkspace(),
           params?.range
             ? genRangeWhere(params.range, sessions.createdAt, (date) => date.toDate())
             : undefined,
@@ -165,7 +182,7 @@ export class SessionModel {
         title: agents.title,
       })
       .from(sessions)
-      .where(and(eq(sessions.userId, this.userId)))
+      .where(and(eq(sessions.userId, this.userId), this.scopeWorkspace()))
       .leftJoin(topics, eq(sessions.id, topics.sessionId))
       .leftJoin(agentsToSessions, eq(sessions.id, agentsToSessions.sessionId))
       .leftJoin(agents, eq(agentsToSessions.agentId, agents.id))
@@ -182,7 +199,9 @@ export class SessionModel {
         count: count(topics.id).as('count'),
       })
       .from(topics)
-      .where(and(eq(topics.userId, this.userId), isNull(topics.sessionId)));
+      .where(
+        and(eq(topics.userId, this.userId), this.scopeTopicWorkspace(), isNull(topics.sessionId)),
+      );
 
     const inboxCount = inboxResult[0].count;
 
@@ -206,7 +225,7 @@ export class SessionModel {
     const result = await this.db
       .select({ id: sessions.id })
       .from(sessions)
-      .where(eq(sessions.userId, this.userId))
+      .where(and(eq(sessions.userId, this.userId), this.scopeWorkspace()))
       .limit(n + 1);
 
     return result.length > n;
@@ -234,7 +253,11 @@ export class SessionModel {
     return this.db.transaction(async (trx) => {
       if (slug) {
         const existResult = await trx.query.sessions.findFirst({
-          where: and(eq(sessions.slug, slug), eq(sessions.userId, this.userId)),
+          where: and(
+            eq(sessions.slug, slug),
+            eq(sessions.userId, this.userId),
+            this.scopeWorkspace(),
+          ),
         });
 
         if (existResult) return existResult;
@@ -339,7 +362,11 @@ export class SessionModel {
 
   createInbox = async (defaultAgentConfig: PartialDeep<LobeAgentConfig>) => {
     const item = await this.db.query.sessions.findFirst({
-      where: and(eq(sessions.userId, this.userId), eq(sessions.slug, INBOX_SESSION_ID)),
+      where: and(
+        eq(sessions.userId, this.userId),
+        this.scopeWorkspace(),
+        eq(sessions.slug, INBOX_SESSION_ID),
+      ),
     });
 
     if (item) return;
@@ -409,7 +436,7 @@ export class SessionModel {
       // Delete the session (this will cascade delete messages, topics, etc.)
       const result = await trx
         .delete(sessions)
-        .where(and(eq(sessions.id, id), eq(sessions.userId, this.userId)));
+        .where(and(eq(sessions.id, id), eq(sessions.userId, this.userId), this.scopeWorkspace()));
 
       // Delete orphaned agents
       await this.clearOrphanAgent(agentIds, trx);
@@ -445,7 +472,9 @@ export class SessionModel {
       // Delete the sessions
       const result = await trx
         .delete(sessions)
-        .where(and(inArray(sessions.id, ids), eq(sessions.userId, this.userId)));
+        .where(
+          and(inArray(sessions.id, ids), eq(sessions.userId, this.userId), this.scopeWorkspace()),
+        );
 
       // Delete orphaned agents
       await this.clearOrphanAgent(agentIds, trx);
@@ -459,6 +488,37 @@ export class SessionModel {
    */
   deleteAll = async () => {
     return this.db.transaction(async (trx) => {
+      if (this.workspaceId) {
+        // Workspace-scoped delete: only rows belonging to current workspace
+        // Agent / session join table doesn't carry workspaceId, so scope via agents.workspaceId subquery
+        const wsAgentIds = await trx
+          .select({ id: agents.id })
+          .from(agents)
+          .where(and(eq(agents.userId, this.userId), eq(agents.workspaceId, this.workspaceId)));
+        const agentIds = wsAgentIds.map((a) => a.id);
+
+        if (agentIds.length > 0) {
+          await trx
+            .delete(agentsToSessions)
+            .where(
+              and(
+                eq(agentsToSessions.userId, this.userId),
+                inArray(agentsToSessions.agentId, agentIds),
+              ),
+            );
+        }
+
+        await trx
+          .delete(agents)
+          .where(and(eq(agents.userId, this.userId), eq(agents.workspaceId, this.workspaceId)));
+
+        return trx
+          .delete(sessions)
+          .where(
+            and(eq(sessions.userId, this.userId), eq(sessions.workspaceId, this.workspaceId)),
+          );
+      }
+
       // Delete all agentsToSessions for this user
       await trx.delete(agentsToSessions).where(eq(agentsToSessions.userId, this.userId));
 
@@ -489,7 +549,13 @@ export class SessionModel {
     if (orphanedAgentIds.length > 0) {
       await trx
         .delete(agents)
-        .where(and(inArray(agents.id, orphanedAgentIds), eq(agents.userId, this.userId)));
+        .where(
+          and(
+            inArray(agents.id, orphanedAgentIds),
+            eq(agents.userId, this.userId),
+            this.scopeAgentWorkspace(),
+          ),
+        );
     }
   };
 
@@ -499,7 +565,7 @@ export class SessionModel {
     return this.db
       .update(sessions)
       .set(data)
-      .where(and(eq(sessions.id, id), eq(sessions.userId, this.userId)))
+      .where(and(eq(sessions.id, id), eq(sessions.userId, this.userId), this.scopeWorkspace()))
       .returning();
   };
 
@@ -559,7 +625,13 @@ export class SessionModel {
     return this.db
       .update(agents)
       .set(mergedValue)
-      .where(and(eq(agents.id, session.agent.id), eq(agents.userId, this.userId)));
+      .where(
+        and(
+          eq(agents.id, session.agent.id),
+          eq(agents.userId, this.userId),
+          this.scopeAgentWorkspace(),
+        ),
+      );
   };
 
   // **************** Helper *************** //
@@ -653,6 +725,7 @@ export class SessionModel {
         orderBy: [asc(agents.id)],
         where: and(
           eq(agents.userId, this.userId),
+          this.scopeAgentWorkspace(),
           sql`(${agents.title} @@@ ${bm25Query} OR ${agents.description} @@@ ${bm25Query})`,
         ),
         with: { agentsToSessions: { columns: {}, with: { session: true } } },

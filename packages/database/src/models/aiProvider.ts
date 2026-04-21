@@ -31,6 +31,12 @@ export class AiProviderModel {
     this.workspaceId = workspaceId;
   }
 
+  private scopeWorkspace = () =>
+    this.workspaceId ? eq(aiProviders.workspaceId, this.workspaceId) : undefined;
+
+  private scopeModelWorkspace = () =>
+    this.workspaceId ? eq(aiModels.workspaceId, this.workspaceId) : undefined;
+
   create = async (
     { keyVaults: userKey, ...params }: CreateAiProviderParams,
     encryptor?: EncryptUserKeyVaults,
@@ -59,23 +65,33 @@ export class AiProviderModel {
       // 1. delete all models of the provider
       await trx
         .delete(aiModels)
-        .where(and(eq(aiModels.providerId, id), eq(aiModels.userId, this.userId)));
+        .where(
+          and(
+            eq(aiModels.providerId, id),
+            eq(aiModels.userId, this.userId),
+            this.scopeModelWorkspace(),
+          ),
+        );
 
       // 2. delete the provider
       await trx
         .delete(aiProviders)
-        .where(and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId)));
+        .where(
+          and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId), this.scopeWorkspace()),
+        );
     });
   };
 
   deleteAll = async () => {
-    return this.db.delete(aiProviders).where(eq(aiProviders.userId, this.userId));
+    return this.db
+      .delete(aiProviders)
+      .where(and(eq(aiProviders.userId, this.userId), this.scopeWorkspace()));
   };
 
   query = async () => {
     return this.db.query.aiProviders.findMany({
       orderBy: [desc(aiProviders.updatedAt)],
-      where: eq(aiProviders.userId, this.userId),
+      where: and(eq(aiProviders.userId, this.userId), this.scopeWorkspace()),
     });
   };
 
@@ -91,7 +107,7 @@ export class AiProviderModel {
         source: aiProviders.source,
       })
       .from(aiProviders)
-      .where(eq(aiProviders.userId, this.userId))
+      .where(and(eq(aiProviders.userId, this.userId), this.scopeWorkspace()))
       .orderBy(asc(aiProviders.sort), desc(aiProviders.updatedAt));
 
     return result as AiProviderListItem[];
@@ -99,7 +115,11 @@ export class AiProviderModel {
 
   findById = async (id: string) => {
     return this.db.query.aiProviders.findFirst({
-      where: and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId)),
+      where: and(
+        eq(aiProviders.id, id),
+        eq(aiProviders.userId, this.userId),
+        this.scopeWorkspace(),
+      ),
     });
   };
 
@@ -107,7 +127,9 @@ export class AiProviderModel {
     return this.db
       .update(aiProviders)
       .set({ ...value, updatedAt: new Date() })
-      .where(and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId)));
+      .where(
+        and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId), this.scopeWorkspace()),
+      );
   };
 
   updateConfig = async (
@@ -219,7 +241,13 @@ export class AiProviderModel {
         source: aiProviders.source,
       })
       .from(aiProviders)
-      .where(and(eq(aiProviders.id, id), eq(aiProviders.userId, this.userId)))
+      .where(
+        and(
+          eq(aiProviders.id, id),
+          eq(aiProviders.userId, this.userId),
+          this.scopeWorkspace(),
+        ),
+      )
       .limit(1);
 
     const [result] = await query;
@@ -270,7 +298,7 @@ export class AiProviderModel {
         settings: aiProviders.settings,
       })
       .from(aiProviders)
-      .where(and(eq(aiProviders.userId, this.userId)));
+      .where(and(eq(aiProviders.userId, this.userId), this.scopeWorkspace()));
 
     const decrypt = decryptor ?? JSON.parse;
     const runtimeConfig: Record<string, AiProviderRuntimeConfig> = {};

@@ -59,6 +59,9 @@ export class TopicModel {
     this.db = db;
     this.workspaceId = workspaceId;
   }
+
+  private scopeWorkspace = () =>
+    this.workspaceId ? eq(topics.workspaceId, this.workspaceId) : undefined;
   // **************** Query *************** //
 
   query = async ({
@@ -80,6 +83,7 @@ export class TopicModel {
     if (groupId) {
       const whereCondition = and(
         eq(topics.userId, this.userId),
+        this.scopeWorkspace(),
         eq(topics.groupId, groupId),
         excludeTriggerCondition,
       );
@@ -159,14 +163,28 @@ export class TopicModel {
             updatedAt: topics.updatedAt,
           })
           .from(topics)
-          .where(and(eq(topics.userId, this.userId), agentCondition, excludeTriggerCondition))
+          .where(
+            and(
+              eq(topics.userId, this.userId),
+              this.scopeWorkspace(),
+              agentCondition,
+              excludeTriggerCondition,
+            ),
+          )
           .orderBy(desc(topics.favorite), desc(topics.updatedAt))
           .limit(pageSize)
           .offset(offset),
         this.db
           .select({ count: count(topics.id) })
           .from(topics)
-          .where(and(eq(topics.userId, this.userId), agentCondition, excludeTriggerCondition)),
+          .where(
+            and(
+              eq(topics.userId, this.userId),
+              this.scopeWorkspace(),
+              agentCondition,
+              excludeTriggerCondition,
+            ),
+          ),
       ]);
 
       return { items, total: totalResult[0].count };
@@ -175,6 +193,7 @@ export class TopicModel {
     // Fallback to containerId-based query (backward compatibility)
     const whereCondition = and(
       eq(topics.userId, this.userId),
+      this.scopeWorkspace(),
       this.matchContainer(containerId),
       excludeTriggerCondition,
     );
@@ -214,7 +233,7 @@ export class TopicModel {
 
   findById = async (id: string) => {
     return this.db.query.topics.findFirst({
-      where: and(eq(topics.id, id), eq(topics.userId, this.userId)),
+      where: and(eq(topics.id, id), eq(topics.userId, this.userId), this.scopeWorkspace()),
     });
   };
 
@@ -223,7 +242,7 @@ export class TopicModel {
       .select()
       .from(topics)
       .orderBy(topics.updatedAt)
-      .where(eq(topics.userId, this.userId));
+      .where(and(eq(topics.userId, this.userId), this.scopeWorkspace()));
   };
 
   queryByKeyword = async (keyword: string, containerId?: string | null): Promise<TopicItem[]> => {
@@ -240,6 +259,7 @@ export class TopicModel {
         .where(
           and(
             eq(topics.userId, this.userId),
+            this.scopeWorkspace(),
             this.matchContainer(containerId),
             sql`${topics.title} @@@ ${bm25Query}`,
           ),
@@ -255,6 +275,7 @@ export class TopicModel {
             eq(messages.userId, this.userId),
             sql`${messages.content} @@@ ${bm25Query}`,
             eq(topics.userId, this.userId),
+            this.scopeWorkspace(),
             this.matchContainer(containerId),
           ),
         )
@@ -272,7 +293,11 @@ export class TopicModel {
 
     const topicsByMessages = await this.db.query.topics.findMany({
       orderBy: [desc(topics.updatedAt)],
-      where: and(eq(topics.userId, this.userId), inArray(topics.id, topicIds)),
+      where: and(
+        eq(topics.userId, this.userId),
+        this.scopeWorkspace(),
+        inArray(topics.id, topicIds),
+      ),
     });
 
     // Merge results and deduplicate
@@ -328,6 +353,7 @@ export class TopicModel {
       .where(
         genWhere([
           eq(topics.userId, this.userId),
+          this.scopeWorkspace(),
           agentCondition,
           params?.containerId ? this.matchContainer(params.containerId) : undefined,
           params?.range
@@ -354,7 +380,7 @@ export class TopicModel {
         title: topics.title,
       })
       .from(topics)
-      .where(and(eq(topics.userId, this.userId)))
+      .where(and(eq(topics.userId, this.userId), this.scopeWorkspace()))
       .leftJoin(messages, eq(topics.id, messages.topicId))
       .groupBy(topics.id)
       .orderBy(desc(sql`count`))
@@ -384,6 +410,7 @@ export class TopicModel {
       .where(
         and(
           eq(topics.userId, this.userId),
+          this.scopeWorkspace(),
           or(
             // Group topics: has groupId
             not(isNull(topics.groupId)),
@@ -477,7 +504,11 @@ export class TopicModel {
     return this.db.transaction(async (tx) => {
       // find original topic
       const originalTopic = await tx.query.topics.findFirst({
-        where: and(eq(topics.id, topicId), eq(topics.userId, this.userId)),
+        where: and(
+          eq(topics.id, topicId),
+          eq(topics.userId, this.userId),
+          this.scopeWorkspace(),
+        ),
       });
 
       if (!originalTopic) {
@@ -584,7 +615,9 @@ export class TopicModel {
    * Delete a session, also delete all messages and topics associated with it.
    */
   delete = async (id: string) => {
-    return this.db.delete(topics).where(and(eq(topics.id, id), eq(topics.userId, this.userId)));
+    return this.db
+      .delete(topics)
+      .where(and(eq(topics.id, id), eq(topics.userId, this.userId), this.scopeWorkspace()));
   };
 
   /**
@@ -593,7 +626,9 @@ export class TopicModel {
   batchDeleteBySessionId = async (sessionId?: string | null) => {
     return this.db
       .delete(topics)
-      .where(and(this.matchSession(sessionId), eq(topics.userId, this.userId)));
+      .where(
+        and(this.matchSession(sessionId), eq(topics.userId, this.userId), this.scopeWorkspace()),
+      );
   };
 
   /**
@@ -602,7 +637,7 @@ export class TopicModel {
   batchDeleteByGroupId = async (groupId?: string | null) => {
     return this.db
       .delete(topics)
-      .where(and(this.matchGroup(groupId), eq(topics.userId, this.userId)));
+      .where(and(this.matchGroup(groupId), eq(topics.userId, this.userId), this.scopeWorkspace()));
   };
 
   /**
@@ -626,7 +661,9 @@ export class TopicModel {
       ? or(eq(topics.agentId, agentId), eq(topics.sessionId, associatedSessionId))
       : eq(topics.agentId, agentId);
 
-    return this.db.delete(topics).where(and(eq(topics.userId, this.userId), agentCondition));
+    return this.db
+      .delete(topics)
+      .where(and(eq(topics.userId, this.userId), this.scopeWorkspace(), agentCondition));
   };
 
   /**
@@ -635,11 +672,15 @@ export class TopicModel {
   batchDelete = async (ids: string[]) => {
     return this.db
       .delete(topics)
-      .where(and(inArray(topics.id, ids), eq(topics.userId, this.userId)));
+      .where(
+        and(inArray(topics.id, ids), eq(topics.userId, this.userId), this.scopeWorkspace()),
+      );
   };
 
   deleteAll = async () => {
-    return this.db.delete(topics).where(eq(topics.userId, this.userId));
+    return this.db
+      .delete(topics)
+      .where(and(eq(topics.userId, this.userId), this.scopeWorkspace()));
   };
 
   // **************** Update *************** //
@@ -648,7 +689,7 @@ export class TopicModel {
     return this.db
       .update(topics)
       .set({ ...data, updatedAt: new Date() })
-      .where(and(eq(topics.id, id), eq(topics.userId, this.userId)))
+      .where(and(eq(topics.id, id), eq(topics.userId, this.userId), this.scopeWorkspace()))
       .returning();
   };
 
@@ -660,7 +701,7 @@ export class TopicModel {
     // Get existing topic to merge metadata
     const existing = await this.db.query.topics.findFirst({
       columns: { metadata: true },
-      where: and(eq(topics.id, id), eq(topics.userId, this.userId)),
+      where: and(eq(topics.id, id), eq(topics.userId, this.userId), this.scopeWorkspace()),
     });
 
     const mergedMetadata: ChatTopicMetadata = {
@@ -671,7 +712,7 @@ export class TopicModel {
     return this.db
       .update(topics)
       .set({ metadata: mergedMetadata })
-      .where(and(eq(topics.id, id), eq(topics.userId, this.userId)))
+      .where(and(eq(topics.id, id), eq(topics.userId, this.userId), this.scopeWorkspace()))
       .returning();
   };
 
@@ -721,6 +762,7 @@ export class TopicModel {
       orderBy: (fields, { asc }) => [asc(fields.createdAt), asc(fields.id)],
       where: and(
         eq(topics.userId, this.userId),
+        this.scopeWorkspace(),
         options.startDate ? gte(topics.createdAt, options.startDate) : undefined,
         options.endDate ? lte(topics.createdAt, options.endDate) : undefined,
         options.ignoreExtracted
@@ -747,6 +789,7 @@ export class TopicModel {
       .where(
         and(
           eq(topics.userId, this.userId),
+          this.scopeWorkspace(),
           options.startDate ? gte(topics.createdAt, options.startDate) : undefined,
           options.endDate ? lte(topics.createdAt, options.endDate) : undefined,
           options.ignoreExtracted
@@ -781,6 +824,7 @@ export class TopicModel {
       .where(
         and(
           eq(topics.userId, this.userId),
+          this.scopeWorkspace(),
           eq(topics.agentId, agentId),
           eq(topics.trigger, 'cron'),
           // Check if metadata contains cronJobId (use ? operator to avoid Neon rt_fetch bug with ->>)
