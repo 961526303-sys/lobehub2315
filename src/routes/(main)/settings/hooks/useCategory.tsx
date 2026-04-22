@@ -5,7 +5,6 @@ import {
   // BellIcon,
   Brain,
   BrainCircuit,
-  Building2,
   ChartColumnBigIcon,
   Coins,
   CreditCard,
@@ -21,6 +20,7 @@ import {
   PaletteIcon,
   Sparkles,
   TerminalSquare,
+  Users,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -88,7 +88,7 @@ export const useCategory = () => {
         label: username ? username : tAuth('tab.profile'),
       },
       enableBusinessFeatures && {
-        icon: Building2,
+        icon: Users,
         key: SettingsTabs.Workspace,
         label: t('tab.workspace'),
       },
