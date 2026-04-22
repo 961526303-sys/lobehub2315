@@ -106,6 +106,7 @@
   "tab.closeLeftTabs": "Zamknij karty po lewej",
   "tab.closeOtherTabs": "Zamknij inne karty",
   "tab.closeRightTabs": "Zamknij karty po prawej",
+  "tab.running": "Agent jest uruchomiony",
   "updater.checkingUpdate": "Sprawdzanie aktualizacji",
   "updater.checkingUpdateDesc": "Pobieranie informacji o wersji...",
   "updater.downloadNewVersion": "Pobierz nową wersję",
@@ -133,5 +134,7 @@
   "window.close": "Zamknij okno",
   "window.maximize": "Maksymalizuj okno",
   "window.minimize": "Minimalizuj okno",
-  "window.restore": "Przywróć okno"
+  "window.pinToTop": "Przypnij na wierzchu",
+  "window.restore": "Przywróć okno",
+  "window.unpinFromTop": "Odepnij z wierzchu"
 }

@@ -106,6 +106,7 @@
   "tab.closeLeftTabs": "إغلاق العلامات على اليسار",
   "tab.closeOtherTabs": "إغلاق العلامات الأخرى",
   "tab.closeRightTabs": "إغلاق العلامات على اليمين",
+  "tab.running": "الوكيل قيد التشغيل",
   "updater.checkingUpdate": "جارٍ التحقق من التحديثات",
   "updater.checkingUpdateDesc": "جارٍ جلب معلومات الإصدار...",
   "updater.downloadNewVersion": "تحميل الإصدار الجديد",
@@ -133,5 +134,7 @@
   "window.close": "إغلاق النافذة",
   "window.maximize": "تكبير النافذة",
   "window.minimize": "تصغير النافذة",
-  "window.restore": "استعادة النافذة"
+  "window.pinToTop": "تثبيت في الأعلى",
+  "window.restore": "استعادة النافذة",
+  "window.unpinFromTop": "إلغاء التثبيت من الأعلى"
 }
