@@ -5,6 +5,7 @@ import {
   // BellIcon,
   Brain,
   BrainCircuit,
+  Building2,
   ChartColumnBigIcon,
   Coins,
   CreditCard,
@@ -42,6 +43,7 @@ export enum SettingsGroupKey {
   General = 'general',
   Subscription = 'subscription',
   System = 'system',
+  Workspace = 'workspace',
 }
 
 export interface CategoryItem {
@@ -87,11 +89,6 @@ export const useCategory = () => {
         key: SettingsTabs.Profile,
         label: username ? username : tAuth('tab.profile'),
       },
-      enableBusinessFeatures && {
-        icon: Users,
-        key: SettingsTabs.Workspace,
-        label: t('tab.workspace'),
-      },
       {
         icon: ChartColumnBigIcon,
         key: SettingsTabs.Stats,
@@ -120,6 +117,28 @@ export const useCategory = () => {
       key: SettingsGroupKey.General,
       title: t('group.common'),
     });
+
+    // Workspace group
+    if (enableBusinessFeatures) {
+      const workspaceItems: CategoryItem[] = [
+        {
+          icon: Building2,
+          key: SettingsTabs.WorkspaceGeneral,
+          label: t('tab.workspaceGeneral'),
+        },
+        {
+          icon: Users,
+          key: SettingsTabs.WorkspaceMembers,
+          label: t('tab.workspaceMembers'),
+        },
+      ];
+
+      groups.push({
+        items: workspaceItems,
+        key: SettingsGroupKey.Workspace,
+        title: t('group.workspace'),
+      });
+    }
 
     // Subscription group
     if (enableBusinessFeatures) {

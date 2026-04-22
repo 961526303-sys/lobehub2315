@@ -82,9 +82,21 @@ export const componentMap = {
     },
   ),
   [SettingsTabs.Workspace]: dynamic(
-    () => import('@/business/client/BusinessSettingPages/Workspace'),
+    () => import('@/business/client/BusinessSettingPages/WorkspaceMembers'),
     {
       loading: loading('Settings > Workspace'),
+    },
+  ),
+  [SettingsTabs.WorkspaceGeneral]: dynamic(
+    () => import('@/business/client/BusinessSettingPages/WorkspaceGeneral'),
+    {
+      loading: loading('Settings > WorkspaceGeneral'),
+    },
+  ),
+  [SettingsTabs.WorkspaceMembers]: dynamic(
+    () => import('@/business/client/BusinessSettingPages/WorkspaceMembers'),
+    {
+      loading: loading('Settings > WorkspaceMembers'),
     },
   ),
 };
