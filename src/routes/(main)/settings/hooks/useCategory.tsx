@@ -41,7 +41,6 @@ import { userGeneralSettingsSelectors } from '@/store/user/slices/settings/selec
 export enum SettingsGroupKey {
   Agent = 'agent',
   General = 'general',
-  Subscription = 'subscription',
   System = 'system',
   Workspace = 'workspace',
 }
@@ -118,7 +117,10 @@ export const useCategory = () => {
       title: t('group.common'),
     });
 
-    // Workspace group
+    // Workspace group — workspace management (general / members) on top,
+    // followed by the subscription / billing items (Plans, Usage, Credits,
+    // Billing, Referral), which are also workspace-scoped for team workspaces
+    // and user-scoped for personal.
     if (enableBusinessFeatures) {
       const workspaceItems: CategoryItem[] = [
         {
@@ -131,18 +133,6 @@ export const useCategory = () => {
           key: SettingsTabs.WorkspaceMembers,
           label: t('tab.workspaceMembers'),
         },
-      ];
-
-      groups.push({
-        items: workspaceItems,
-        key: SettingsGroupKey.Workspace,
-        title: t('group.workspace'),
-      });
-    }
-
-    // Subscription group
-    if (enableBusinessFeatures) {
-      const subscriptionItems: CategoryItem[] = [
         { icon: Map, key: SettingsTabs.Plans, label: tSubscription('tab.plans') },
         { icon: ChartColumnBigIcon, key: SettingsTabs.Usage, label: t('tab.usage') },
         { icon: Coins, key: SettingsTabs.Credits, label: tSubscription('tab.credits') },
@@ -151,9 +141,9 @@ export const useCategory = () => {
       ];
 
       groups.push({
-        items: subscriptionItems,
-        key: SettingsGroupKey.Subscription,
-        title: t('group.subscription'),
+        items: workspaceItems,
+        key: SettingsGroupKey.Workspace,
+        title: t('group.workspace'),
       });
     }
 
