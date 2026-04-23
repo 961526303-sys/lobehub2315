@@ -1,7 +1,7 @@
 import { authedProcedure } from '@/libs/trpc/lambda';
 import { trpc } from '@/libs/trpc/lambda/init';
 
-export type WorkspaceRole = 'admin' | 'editor' | 'member' | 'owner';
+export type WorkspaceRole = 'member' | 'owner' | 'viewer';
 
 export const cloudWorkspaceAuth = trpc.middleware(async (opts) => opts.next());
 
@@ -12,6 +12,6 @@ export const requireWorkspaceRole = (_minRole: WorkspaceRole) =>
 
 export const wsProcedure = authedProcedure;
 
-export const wsAdminProcedure = authedProcedure;
+export const wsMemberProcedure = authedProcedure;
 
 export const wsOwnerProcedure = authedProcedure;
