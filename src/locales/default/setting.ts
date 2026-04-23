@@ -1108,6 +1108,8 @@ When I am ___, I need ___
   'workspace.wizard.step2.createFailed': 'Failed to create workspace',
   'workspace.wizard.step2.createFree': 'Create workspace',
   'workspace.wizard.step2.createdToast': 'Workspace {{name}} created.',
+  'workspace.wizard.step2.freeLimitReached':
+    "You've reached the free workspace limit ({{limit}}). Upgrade to Premium or Ultimate to create more.",
   'workspace.wizard.step2.features.adminControls.desc':
     'Centralized billing, role management, and audit logs keep the workspace under control.',
   'workspace.wizard.step2.features.adminControls.title': 'Admin controls',
@@ -1123,6 +1125,7 @@ When I am ___, I need ___
   'workspace.wizard.step2.left.headline': 'Power your team with {{plan}}',
   'workspace.wizard.step2.payFailed': 'Failed to start checkout',
   'workspace.wizard.step2.pill.free': 'Free',
+  'workspace.wizard.step2.pill.freeUsed': '{{used}}/{{limit}} used',
   'workspace.wizard.step2.seats.hint': 'Between {{min}} and {{max}} seats.',
   'workspace.wizard.step2.seats.label': 'Seats',
   'workspace.wizard.step2.subtitle':
