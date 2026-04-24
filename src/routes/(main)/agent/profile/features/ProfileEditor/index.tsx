@@ -1,5 +1,6 @@
 'use client';
 
+import type { HeterogeneousProviderConfig } from '@lobechat/types';
 import { Flexbox } from '@lobehub/ui';
 import { Divider } from 'antd';
 import isEqual from 'fast-deep-equal';
@@ -36,6 +37,34 @@ const ProfileEditor = memo(() => {
     });
   };
 
+  const updateHeterogeneousAuthMode = async (authMode: 'subscription' | 'api') => {
+    if (!heterogeneousProvider) return;
+
+    await updateConfig({
+      agencyConfig: {
+        heterogeneousProvider: {
+          ...heterogeneousProvider,
+          authMode,
+        },
+      },
+    });
+  };
+
+  const updateHeterogeneousApiConfig = async (
+    apiConfig: HeterogeneousProviderConfig['apiConfig'],
+  ) => {
+    if (!heterogeneousProvider) return;
+
+    await updateConfig({
+      agencyConfig: {
+        heterogeneousProvider: {
+          ...heterogeneousProvider,
+          apiConfig,
+        },
+      },
+    });
+  };
+
   return (
     <>
       <Flexbox
@@ -50,6 +79,8 @@ const ProfileEditor = memo(() => {
           // Heterogeneous integration mode: show provider CLI status instead of model/skills pickers
           <HeterogeneousAgentStatusCard
             provider={heterogeneousProvider}
+            onApiConfigChange={updateHeterogeneousApiConfig}
+            onAuthModeChange={updateHeterogeneousAuthMode}
             onCommandChange={updateHeterogeneousCommand}
           />
         ) : (

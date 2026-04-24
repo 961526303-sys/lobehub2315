@@ -178,6 +178,7 @@
   "groupWizard.searchTemplates": "搜索模板…",
   "groupWizard.title": "创建群组",
   "groupWizard.useTemplate": "使用模板",
+  "heteroAgent.apiMode.providerNotFound": "服务商 \"{{providerId}}\" 尚未配置，请先到服务商设置填写 API Key。",
   "heteroAgent.fullAccess.label": "完全访问权限",
   "heteroAgent.fullAccess.tooltip": "Claude Code 在本地运行，对工作目录拥有完全的读写权限。当前暂不支持切换权限模式。",
   "heteroAgent.resumeReset.cwdChanged": "工作目录已切换，之前的 Claude Code 会话只能在原目录下继续，已开始新对话。",

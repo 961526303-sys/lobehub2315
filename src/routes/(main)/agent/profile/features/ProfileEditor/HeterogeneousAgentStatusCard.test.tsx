@@ -75,9 +75,76 @@ vi.mock('@lobehub/ui', () => ({
       }}
     />
   ),
+  Segmented: ({
+    onChange,
+    options,
+    value,
+  }: {
+    onChange?: (v: string) => void;
+    options: Array<{ label: ReactNode; value: string }>;
+    value?: string;
+  }) => (
+    <div role="radiogroup">
+      {options.map((opt) => (
+        <button
+          aria-pressed={value === opt.value}
+          key={opt.value}
+          type="button"
+          onClick={() => onChange?.(opt.value)}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  ),
   Tag: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
   Text: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
   Tooltip: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('antd', () => ({
+  Select: ({
+    onChange,
+    options,
+    value,
+  }: {
+    onChange?: (v: string) => void;
+    options?: Array<{ label: ReactNode; value: string }>;
+    value?: string;
+  }) => (
+    <select value={value ?? ''} onChange={(e) => onChange?.(e.target.value)}>
+      {(options ?? []).map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {typeof opt.label === 'string' ? opt.label : opt.value}
+        </option>
+      ))}
+    </select>
+  ),
+}));
+
+vi.mock('@/features/Electron/HeterogeneousAgent/hooks/useClaudeCodeCompatibleProviders', () => ({
+  useClaudeCodeCompatibleProviders: () => ({
+    modelsByProvider: {},
+    providers: [],
+  }),
+}));
+
+vi.mock('@/features/ModelSelect', () => ({
+  default: ({
+    onChange,
+    value,
+  }: {
+    onChange?: (next: { model: string; provider: string }) => void;
+    value?: { model: string; provider?: string };
+  }) => (
+    <button
+      data-testid="mock-model-select"
+      type="button"
+      onClick={() => onChange?.({ model: 'x', provider: 'y' })}
+    >
+      {value?.model ?? ''}
+    </button>
+  ),
 }));
 
 vi.mock('antd-style', () => ({
