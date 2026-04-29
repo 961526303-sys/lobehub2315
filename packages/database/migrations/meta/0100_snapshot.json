@@ -6,7 +6,7 @@
   },
   "dialect": "postgresql",
   "enums": {},
-  "id": "bc5e23cb-d00f-48ac-b948-5c07d17db78a",
+  "id": "1c15c41a-6f55-4bd2-aef1-b8637a912a97",
   "policies": {},
   "prevId": "784a820a-8a43-4a02-9057-b230420f0c39",
   "roles": {},
@@ -5300,8 +5300,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.lobeai_account_links": {
-      "name": "lobeai_account_links",
+    "public.messenger_account_links": {
+      "name": "messenger_account_links",
       "schema": "",
       "columns": {
         "id": {
@@ -5371,8 +5371,8 @@
         }
       },
       "indexes": {
-        "lobeai_account_links_platform_user_unique": {
-          "name": "lobeai_account_links_platform_user_unique",
+        "messenger_account_links_platform_user_unique": {
+          "name": "messenger_account_links_platform_user_unique",
           "columns": [
             {
               "expression": "platform",
@@ -5392,8 +5392,8 @@
           "method": "btree",
           "with": {}
         },
-        "lobeai_account_links_user_platform_unique": {
-          "name": "lobeai_account_links_user_platform_unique",
+        "messenger_account_links_user_platform_unique": {
+          "name": "messenger_account_links_user_platform_unique",
           "columns": [
             {
               "expression": "user_id",
@@ -5413,8 +5413,8 @@
           "method": "btree",
           "with": {}
         },
-        "lobeai_account_links_active_agent_idx": {
-          "name": "lobeai_account_links_active_agent_idx",
+        "messenger_account_links_active_agent_idx": {
+          "name": "messenger_account_links_active_agent_idx",
           "columns": [
             {
               "expression": "active_agent_id",
@@ -5430,18 +5430,18 @@
         }
       },
       "foreignKeys": {
-        "lobeai_account_links_user_id_users_id_fk": {
-          "name": "lobeai_account_links_user_id_users_id_fk",
-          "tableFrom": "lobeai_account_links",
+        "messenger_account_links_user_id_users_id_fk": {
+          "name": "messenger_account_links_user_id_users_id_fk",
+          "tableFrom": "messenger_account_links",
           "tableTo": "users",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "lobeai_account_links_active_agent_id_agents_id_fk": {
-          "name": "lobeai_account_links_active_agent_id_agents_id_fk",
-          "tableFrom": "lobeai_account_links",
+        "messenger_account_links_active_agent_id_agents_id_fk": {
+          "name": "messenger_account_links_active_agent_id_agents_id_fk",
+          "tableFrom": "messenger_account_links",
           "tableTo": "agents",
           "columnsFrom": ["active_agent_id"],
           "columnsTo": ["id"],
