@@ -57,7 +57,8 @@ class AgentDocumentService {
 
   listDocuments = async (params: {
     agentId: string;
-    target?: 'agent' | 'currentTopic';
+    scope?: 'agent' | 'currentTopic';
+    sourceType?: 'all' | 'file' | 'web';
     topicId?: string;
   }) => {
     return lambdaClient.agentDocument.listDocuments.query(params);
@@ -242,7 +243,9 @@ export const mapAgentDocumentsToContext = (
     policyId: doc.templateId,
     policyLoad: doc.policyLoad as 'always' | 'progressive',
     policyLoadFormat: doc.policy?.context?.policyLoadFormat || doc.policyLoadFormat || undefined,
+    sourceType: doc.sourceType ?? undefined,
     title: doc.title,
+    updatedAt: doc.updatedAt ?? undefined,
   }));
 
 export const resolveAgentDocumentsContext = async (params: {

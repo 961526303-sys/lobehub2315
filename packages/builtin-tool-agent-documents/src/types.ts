@@ -14,7 +14,7 @@ export const AgentDocumentsApiName = {
 
 export interface CreateDocumentArgs {
   content: string;
-  target?: 'agent' | 'currentTopic';
+  scope?: 'agent' | 'currentTopic';
   title: string;
 }
 
@@ -152,7 +152,8 @@ export interface AgentDocumentReference {
 }
 
 export interface ListDocumentsArgs {
-  target?: 'agent' | 'currentTopic';
+  scope?: 'agent' | 'currentTopic';
+  sourceType?: 'all' | 'file' | 'web';
 }
 
 export interface ListDocumentsState {

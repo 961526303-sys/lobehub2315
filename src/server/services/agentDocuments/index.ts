@@ -439,19 +439,26 @@ export class AgentDocumentsService {
     }
   }
 
-  async listDocuments(agentId: string) {
+  async listDocuments(agentId: string, sourceType?: 'all' | 'file' | 'web') {
     const docs = await this.agentDocumentModel.findByAgent(agentId);
-    return docs.map((d) => ({
+    const filtered =
+      sourceType && sourceType !== 'all' ? docs.filter((d) => d.sourceType === sourceType) : docs;
+    return filtered.map((d) => ({
       documentId: d.documentId,
       fileType: d.fileType,
       filename: d.filename,
       id: d.id,
       loadPosition: d.policy?.context?.position,
+      sourceType: d.sourceType,
       title: d.title,
     }));
   }
 
-  async listDocumentsForTopic(agentId: string, topicId: string) {
+  async listDocumentsForTopic(
+    agentId: string,
+    topicId: string,
+    sourceType?: 'all' | 'file' | 'web',
+  ) {
     const topicDocs = await this.topicDocumentModel.findByTopicId(topicId);
     const documentIds = topicDocs.map((doc) => doc.id);
     const docs = await this.agentDocumentModel.findByDocumentIds(agentId, documentIds);
@@ -460,12 +467,14 @@ export class AgentDocumentsService {
     return topicDocs
       .map((topicDoc) => docsByDocumentId.get(topicDoc.id))
       .filter((doc): doc is AgentDocumentWithRules => Boolean(doc))
+      .filter((doc) => !sourceType || sourceType === 'all' || doc.sourceType === sourceType)
       .map((doc) => ({
         documentId: doc.documentId,
         fileType: doc.fileType,
         filename: doc.filename,
         id: doc.id,
         loadPosition: doc.policy?.context?.position,
+        sourceType: doc.sourceType,
         title: doc.title,
       }));
   }
