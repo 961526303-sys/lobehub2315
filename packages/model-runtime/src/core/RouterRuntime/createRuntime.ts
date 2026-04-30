@@ -30,6 +30,7 @@ import type {
   ILobeAgentRuntimeErrorType,
   TextToSpeechPayload,
 } from '../../types';
+import { AgentRuntimeError } from '../../utils/createError';
 import { postProcessModelList } from '../../utils/postProcessModelList';
 import { safeParseJSON } from '../../utils/safeParseJSON';
 import type { LobeRuntimeAI } from '../BaseAI';
@@ -208,7 +209,11 @@ export const createRouterRuntime = ({
           : this._routers;
 
       if (resolvedRouters.length === 0) {
-        throw new Error('empty providers');
+        throw AgentRuntimeError.chat({
+          error: { message: 'empty providers' },
+          errorType: AgentRuntimeErrorType.NoAvailableProvider,
+          provider: this._id,
+        });
       }
 
       return resolvedRouters;
