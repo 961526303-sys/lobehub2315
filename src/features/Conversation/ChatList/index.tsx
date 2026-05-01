@@ -18,8 +18,6 @@ import { MessageActionProvider } from '../Messages/Contexts/MessageActionProvide
 import { dataSelectors, useConversationStore } from '../store';
 import VirtualizedList from './components/VirtualizedList';
 
-const DEBUG_AGENT_MOCK_REPLAY = process.env.NODE_ENV === 'development';
-
 export interface ChatListProps {
   /**
    * Default expand level for assistant workflow (tool-call) groups. When set,
@@ -93,19 +91,6 @@ const ChatList = memo<ChatListProps>(
       [displayMessageIds.length, defaultWorkflowExpandLevel],
     );
     const messagesInit = useConversationStore(dataSelectors.messagesInit);
-    const dbMessages = useConversationStore(dataSelectors.dbMessages);
-
-    if (DEBUG_AGENT_MOCK_REPLAY) {
-      console.info('[AgentMockReplay] ChatList:render', {
-        context,
-        dbMessageCount: dbMessages.length,
-        dbMessageIds: dbMessages.map((message) => message.id),
-        displayMessageCount: displayMessageIds.length,
-        displayMessageIds,
-        messagesInit,
-        skipFetch,
-      });
-    }
 
     // When topicId is null (new conversation), show welcome directly without waiting for fetch
     // because there's no server data to fetch - only local optimistic updates exist
