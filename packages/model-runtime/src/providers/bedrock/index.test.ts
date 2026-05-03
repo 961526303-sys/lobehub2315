@@ -207,7 +207,7 @@ describe('LobeBedrockAI', () => {
             { content: 'Continue this answer', role: 'user' },
             { content: 'Partial assistant draft', role: 'assistant' },
           ],
-          model: 'claude-opus-4-7',
+          model: 'global.anthropic.claude-opus-4-7',
         });
 
         const commandInput = (InvokeModelWithResponseStreamCommand as Mock).mock.calls[0][0];

@@ -139,6 +139,7 @@ export const shouldOmitSamplingParams = (model: string): boolean => {
 
 export const assistantPrefillUnsupportedModelPatterns: RegExp[] = [
   /^claude-(opus|sonnet)-4-(6|7)(\b|-)/,
+  /anthropic\.claude-(opus|sonnet)-4-(6|7)(\b|-)/,
 ];
 
 export const shouldDropUnsupportedClaudeAssistantPrefill = (model: string): boolean => {
