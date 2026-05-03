@@ -210,7 +210,8 @@ describe('LobeBedrockAI', () => {
           model: 'global.anthropic.claude-opus-4-7',
         });
 
-        const commandInput = (InvokeModelWithResponseStreamCommand as Mock).mock.calls[0][0];
+        const commandInput = (InvokeModelWithResponseStreamCommand as unknown as Mock).mock
+          .calls[0][0];
         const body = JSON.parse(commandInput.body);
 
         expect(body.messages).toEqual([
