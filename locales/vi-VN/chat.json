@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Chỉnh sửa",
   "taskDetail.comment.save": "Lưu",
   "taskDetail.commentPlaceholder": "Để lại bình luận...",
+  "taskDetail.commentSubmitAndRun": "Gửi & chạy ngay bây giờ",
   "taskDetail.deleteConfirm.content": "Hành động này không thể hoàn tác.",
   "taskDetail.deleteConfirm.ok": "Xóa",
   "taskDetail.deleteConfirm.title": "Xóa tác vụ này?",

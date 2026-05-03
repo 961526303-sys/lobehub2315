@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Редактировать",
   "taskDetail.comment.save": "Сохранить",
   "taskDetail.commentPlaceholder": "Оставьте комментарий...",
+  "taskDetail.commentSubmitAndRun": "Отправить и запустить сейчас",
   "taskDetail.deleteConfirm.content": "Это действие нельзя отменить.",
   "taskDetail.deleteConfirm.ok": "Удалить",
   "taskDetail.deleteConfirm.title": "Удалить эту задачу?",

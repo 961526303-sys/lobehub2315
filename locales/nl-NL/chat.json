@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Bewerken",
   "taskDetail.comment.save": "Opslaan",
   "taskDetail.commentPlaceholder": "Laat een reactie achter...",
+  "taskDetail.commentSubmitAndRun": "Verzenden & nu uitvoeren",
   "taskDetail.deleteConfirm.content": "Deze actie kan niet ongedaan worden gemaakt.",
   "taskDetail.deleteConfirm.ok": "Verwijderen",
   "taskDetail.deleteConfirm.title": "Deze taak verwijderen?",

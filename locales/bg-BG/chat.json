@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Редактиране",
   "taskDetail.comment.save": "Запази",
   "taskDetail.commentPlaceholder": "Оставете коментар...",
+  "taskDetail.commentSubmitAndRun": "Изпрати и изпълни сега",
   "taskDetail.deleteConfirm.content": "Това действие не може да бъде отменено.",
   "taskDetail.deleteConfirm.ok": "Изтриване",
   "taskDetail.deleteConfirm.title": "Да изтрия ли тази задача?",

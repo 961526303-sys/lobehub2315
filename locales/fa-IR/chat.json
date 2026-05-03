@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "ویرایش",
   "taskDetail.comment.save": "ذخیره",
   "taskDetail.commentPlaceholder": "دیدگاهی بنویسید...",
+  "taskDetail.commentSubmitAndRun": "ارسال و اجرا کن",
   "taskDetail.deleteConfirm.content": "این عمل غیرقابل بازگشت است.",
   "taskDetail.deleteConfirm.ok": "حذف",
   "taskDetail.deleteConfirm.title": "این وظیفه حذف شود؟",

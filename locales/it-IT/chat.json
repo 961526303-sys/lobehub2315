@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Modifica",
   "taskDetail.comment.save": "Salva",
   "taskDetail.commentPlaceholder": "Lascia un commento...",
+  "taskDetail.commentSubmitAndRun": "Invia e avvia ora",
   "taskDetail.deleteConfirm.content": "Questa azione non può essere annullata.",
   "taskDetail.deleteConfirm.ok": "Elimina",
   "taskDetail.deleteConfirm.title": "Eliminare questa attività?",

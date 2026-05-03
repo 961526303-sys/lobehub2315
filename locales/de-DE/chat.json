@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Bearbeiten",
   "taskDetail.comment.save": "Speichern",
   "taskDetail.commentPlaceholder": "Kommentar hinterlassen...",
+  "taskDetail.commentSubmitAndRun": "Senden & jetzt ausführen",
   "taskDetail.deleteConfirm.content": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "taskDetail.deleteConfirm.ok": "Löschen",
   "taskDetail.deleteConfirm.title": "Diese Aufgabe löschen?",

@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Düzenle",
   "taskDetail.comment.save": "Kaydet",
   "taskDetail.commentPlaceholder": "Yorum bırakın...",
+  "taskDetail.commentSubmitAndRun": "Gönder ve şimdi çalıştır",
   "taskDetail.deleteConfirm.content": "Bu işlem geri alınamaz.",
   "taskDetail.deleteConfirm.ok": "Sil",
   "taskDetail.deleteConfirm.title": "Bu görevi silmek istiyor musunuz?",

@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "تعديل",
   "taskDetail.comment.save": "حفظ",
   "taskDetail.commentPlaceholder": "اترك تعليقًا...",
+  "taskDetail.commentSubmitAndRun": "إرسال وتشغيل الآن",
   "taskDetail.deleteConfirm.content": "لا يمكن التراجع عن هذا الإجراء.",
   "taskDetail.deleteConfirm.ok": "حذف",
   "taskDetail.deleteConfirm.title": "هل تريد حذف هذه المهمة؟",

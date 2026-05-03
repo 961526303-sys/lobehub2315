@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Modifier",
   "taskDetail.comment.save": "Enregistrer",
   "taskDetail.commentPlaceholder": "Laissez un commentaire...",
+  "taskDetail.commentSubmitAndRun": "Envoyer et exécuter maintenant",
   "taskDetail.deleteConfirm.content": "Cette action est irréversible.",
   "taskDetail.deleteConfirm.ok": "Supprimer",
   "taskDetail.deleteConfirm.title": "Supprimer cette tâche ?",

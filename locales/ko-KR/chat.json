@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "편집",
   "taskDetail.comment.save": "저장",
   "taskDetail.commentPlaceholder": "댓글을 남기세요...",
+  "taskDetail.commentSubmitAndRun": "보내기 및 실행",
   "taskDetail.deleteConfirm.content": "이 작업은 되돌릴 수 없습니다.",
   "taskDetail.deleteConfirm.ok": "삭제",
   "taskDetail.deleteConfirm.title": "이 작업을 삭제할까요?",

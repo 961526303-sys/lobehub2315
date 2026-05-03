@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Editar",
   "taskDetail.comment.save": "Salvar",
   "taskDetail.commentPlaceholder": "Deixe um comentário...",
+  "taskDetail.commentSubmitAndRun": "Enviar e executar agora",
   "taskDetail.deleteConfirm.content": "Essa ação não pode ser desfeita.",
   "taskDetail.deleteConfirm.ok": "Excluir",
   "taskDetail.deleteConfirm.title": "Excluir esta tarefa?",

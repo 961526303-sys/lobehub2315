@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "Edytuj",
   "taskDetail.comment.save": "Zapisz",
   "taskDetail.commentPlaceholder": "Zostaw komentarz...",
+  "taskDetail.commentSubmitAndRun": "Wyślij i uruchom teraz",
   "taskDetail.deleteConfirm.content": "Tej czynności nie można cofnąć.",
   "taskDetail.deleteConfirm.ok": "Usuń",
   "taskDetail.deleteConfirm.title": "Usunąć to zadanie?",

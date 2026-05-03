@@ -490,6 +490,7 @@
   "taskDetail.comment.edit": "編集",
   "taskDetail.comment.save": "保存",
   "taskDetail.commentPlaceholder": "コメントを入力...",
+  "taskDetail.commentSubmitAndRun": "送信して実行",
   "taskDetail.deleteConfirm.content": "この操作は取り消せません。",
   "taskDetail.deleteConfirm.ok": "削除",
   "taskDetail.deleteConfirm.title": "このタスクを削除しますか？",
